@@ -10,7 +10,8 @@
     "resources": "resources",
     "language": "resources/i18n",
     "images": "resources/images",
-    "icons": "resources/icons"
+    "icons": "resources/icons",
+    "markdowns": "resources/markdowns"
   },
   "views": {
     "url": "/#",
