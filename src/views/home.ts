@@ -2,6 +2,9 @@ import { BubbleUI } from "../lib/bubble.js";
 import { getConfiguration } from "../lib/configuration.js";
 import { setDomEvents, uiComponent } from "../lib/dom.js";
 import { Html } from "../lib/html.js";
+import { httpGet } from "../lib/http.js";
+import { getIcon } from "../lib/icons.js";
+import MarkdownService from "../services/markdownservice.js";
 import { Theme } from "../services/theme.js";
 
 export default class HomeView {
@@ -46,15 +49,48 @@ export default class HomeView {
       text: "Clicker",
     });
 
+    const gitButton = uiComponent({
+      type: Html.Button,
+      text: "",
+    });
+    const githubIcon = getIcon(
+      "social",
+      "github",
+      "24px",
+      "var(--accent-color)",
+    );
+    gitButton.appendChild(githubIcon);
+
     setDomEvents(button, {
       click: (e) => {
         Theme.toggle();
       },
     });
 
+    setDomEvents(gitButton, {
+      click: (e) => {
+        window.open("https://github.com/Itros97", "_blank");
+      },
+    });
+
+    const a = await HomeView.getDocumentHTML();
+    const doc = uiComponent({
+      text: MarkdownService.render(a),
+    });
+
+    //view.appendChild(doc);
     view.appendChild(title);
     view.appendChild(description);
     view.appendChild(button);
+    view.appendChild(gitButton);
     container.appendChild(view);
+  }
+
+  static async getDocumentHTML(): Promise<string> {
+    const response = await httpGet({
+      url: `${getConfiguration("path")["markdowns"]}/doc.MD`,
+      parameters: {},
+    });
+    return await response.text();
   }
 }
