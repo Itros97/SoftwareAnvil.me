@@ -57,7 +57,7 @@ export default class HomeView {
       "social",
       "github",
       "24px",
-      "var(--accent-color)",
+      "var(--on-surface-1)",
     );
     gitButton.appendChild(githubIcon);
 
@@ -75,14 +75,15 @@ export default class HomeView {
 
     const a = await HomeView.getDocumentHTML();
     const doc = uiComponent({
+      classes: ["markdown"],
       text: MarkdownService.render(a),
     });
 
-    //view.appendChild(doc);
     view.appendChild(title);
     view.appendChild(description);
     view.appendChild(button);
     view.appendChild(gitButton);
+    view.appendChild(doc);
     container.appendChild(view);
   }
 

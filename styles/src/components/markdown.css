@@ -1,0 +1,97 @@
+.markdown {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+    margin-top: 2rem;
+}
+
+.markdown code {
+    background-color: var(--surface-1);
+    color: var(--on-surface-1);
+    margin: 1rem;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 0.35rem;
+    font-family: var(--font-console);
+    display: block;
+}
+
+.markdown blockquote {
+    background-color: var(--surface-1);
+    color: var(--on-surface-1);
+    margin: 1rem;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 0.35rem;
+    font-family: var(--font-light);
+    font-style: italic;
+    font-weight: 600;
+    display: block;
+}
+
+.markdown img {
+    width: 100%;
+    object-fit: cover;
+    margin: 1rem 0;
+    border-radius: 0.35rem;
+}
+
+.markdown p {
+    font-size: 1.25rem;
+    margin: 0.75rem 1rem;
+    line-height: 135%;
+}
+
+.markdown hr {
+    opacity: 0.035;
+    border: 0.1rem solid var(--on-surface-1);
+    width: 100%;
+    border-radius: 1rem;
+}
+
+.markdown ul,
+.markdown ol {
+    padding: 1rem;
+}
+
+.markdown ul li {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.markdown ol li {
+    align-items: center;
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+    margin-left: 1.5rem;
+}
+
+.markdown ol li {
+    list-style: decimal !important;
+}
+
+.markdown ul li::before {
+    --size: 0.5rem;
+    content: ".";
+    display: inline-block;
+
+    width: var(--size);
+    height: var(--size);
+    margin-right: 1rem;
+    color: transparent;
+    border-radius: 0.35rem;
+    background: var(--on-surface-1);
+}
