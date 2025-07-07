@@ -1,0 +1,34 @@
+/*
+ * @license
+ *
+ * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
+ * https://github.com/chjj/marked
+ *
+ * Copyright (c) 2018-2021, Костя Третяк. (MIT Licensed)
+ * https://github.com/ts-stack/markdown
+ */
+export class ExtendRegexp {
+    constructor(regex, flags = '') {
+        this.source = regex.source;
+        this.flags = flags;
+    }
+    /**
+     * Extend regular expression.
+     *
+     * @param groupName Regular expression for search a group name.
+     * @param groupRegexp Regular expression of named group.
+     */
+    setGroup(groupName, groupRegexp) {
+        let newRegexp = typeof groupRegexp == 'string' ? groupRegexp : groupRegexp.source;
+        newRegexp = newRegexp.replace(/(^|[^\[])\^/g, '$1');
+        // Extend regexp.
+        this.source = this.source.replace(groupName, newRegexp);
+        return this;
+    }
+    /**
+     * Returns a result of extending a regular expression.
+     */
+    getRegexp() {
+        return new RegExp(this.source, this.flags);
+    }
+}
