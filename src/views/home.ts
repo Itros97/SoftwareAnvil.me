@@ -1,11 +1,17 @@
 import { BubbleUI } from "../lib/bubble.js";
 import { getConfiguration } from "../lib/configuration.js";
-import { setDomEvents, uiComponent } from "../lib/dom.js";
+import {
+  removeAllDomBySelector,
+  setDomEvents,
+  setDomStyles,
+  uiComponent,
+} from "../lib/dom.js";
 import { Html } from "../lib/html.js";
 import { httpGet } from "../lib/http.js";
 import { getIcon } from "../lib/icons.js";
+import { connectToSignal, setSignal } from "../lib/signals.js";
 import MarkdownService from "../services/markdownservice.js";
-import { Theme } from "../services/theme.js";
+import { Theme, THEME_CHANGED_SIGNAL } from "../services/theme.js";
 
 export default class HomeView {
   // HTML ids and classes
@@ -21,22 +27,20 @@ export default class HomeView {
       classes: [BubbleUI.BoxColumn, BubbleUI.BoxCenter],
     });
 
-    const title = uiComponent({
-      type: Html.H1,
-      text: getConfiguration("base")["app_name"],
-      styles: {
-        fontSize: "5rem",
-        marginBottom: "3rem",
-      },
-      selectable: false,
-    });
+    const topBar = HomeView.topBar();
+    view.appendChild(topBar);
+
+    // const title = uiComponent({
+    //   type: Html.H1,
+    //   text: getConfiguration("base")["app_name"],
+    //   styles: {
+    //     fontSize: "5rem",
+    //     marginBottom: "3rem",
+    //   },
+    //   selectable: false,
+    // });
 
     // Este hace toggle del tema
-    // setDomEvents(view, {
-    //   click: (e) => {
-    //     Theme.toggle();
-    //   },
-    // });
 
     const description = uiComponent({
       type: Html.P,
@@ -57,7 +61,7 @@ export default class HomeView {
       "social",
       "github",
       "24px",
-      "var(--accent-color)",
+      "var(--on-surface-1)",
     );
     gitButton.appendChild(githubIcon);
 
@@ -75,14 +79,15 @@ export default class HomeView {
 
     const a = await HomeView.getDocumentHTML();
     const doc = uiComponent({
+      classes: ["markdown"],
       text: MarkdownService.render(a),
     });
 
-    //view.appendChild(doc);
-    view.appendChild(title);
+    //view.appendChild(title);
     view.appendChild(description);
     view.appendChild(button);
     view.appendChild(gitButton);
+    view.appendChild(doc);
     container.appendChild(view);
   }
 
@@ -92,5 +97,50 @@ export default class HomeView {
       parameters: {},
     });
     return await response.text();
+  }
+
+  static topBar(): HTMLElement {
+    const topBar = uiComponent({
+      type: Html.Div,
+      classes: [BubbleUI.BoxRow, BubbleUI.BoxXBetween],
+      styles: {
+        padding: ".5rem 1rem ",
+        width: "100%",
+        background: "var(--surface-1)",
+        marginBottom: "2rem",
+      },
+    });
+
+    const navTitle = uiComponent({
+      type: Html.P,
+      text: getConfiguration("base")["app_name"],
+    });
+
+    topBar.appendChild(navTitle);
+
+    const iconBar = uiComponent({
+      type: Html.Div,
+      classes: [BubbleUI.BoxRow, BubbleUI.BoxXEnd],
+    });
+    topBar.appendChild(iconBar);
+
+    const themeIconButton = uiComponent({
+      styles: { cursor: "pointer" },
+    });
+    const themeIcon = getIcon(
+      "material",
+      Theme.isDark() ? "light_theme" : "dark_mode",
+      "24px",
+      "var(--on-surface-1)",
+    );
+    themeIcon.id = "theme-icon";
+    themeIconButton.appendChild(themeIcon);
+    iconBar.appendChild(themeIconButton);
+
+    setDomEvents(themeIcon, {
+      click: (e) => Theme.toggle(),
+    });
+
+    return topBar;
   }
 }
