@@ -12,7 +12,7 @@ jobs:
         node-version: '20'
 
     - name: Install node dependencies
-      run: npm install -g rollup && npm install -g typescript
+      run: npm install -g rollup@4 typescript@5.9.3
  
     - name: Transpile typescript
       run: tsc
