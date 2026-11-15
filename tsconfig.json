@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2021",
+    "strict": false,
     "outDir": "./scripts/",
     "rootDir": "./src/",
     "esModuleInterop": true,
