@@ -6,6 +6,8 @@
 
 Personal website of **Itros97**, built as a lightweight single-page application in vanilla TypeScript, with no framework, and deployed to GitHub Pages.
 
+**Live site:** <https://softwareanvil.me/>
+
 ## Table of contents
 
 - [Features](#features)
