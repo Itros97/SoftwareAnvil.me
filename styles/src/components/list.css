@@ -60,3 +60,48 @@
 	font-size: 0.75rem;
 	font-weight: 500;
 }
+
+.setup {
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
+}
+
+.setup-group-title {
+	margin-bottom: 0.5rem;
+	font-size: 1.05rem;
+	font-weight: 600;
+}
+
+.setup-list {
+	display: grid;
+	grid-template-columns: minmax(7rem, max-content) 1fr;
+	column-gap: 1.5rem;
+}
+
+.setup-label,
+.setup-value {
+	padding: 0.6rem 0;
+	border-top: 1px solid var(--border);
+}
+
+.setup-label {
+	color: var(--text-muted);
+	font-family: var(--font-console);
+	font-size: 0.85rem;
+}
+
+.setup-value {
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 30rem) {
+	.setup-list {
+		grid-template-columns: 1fr;
+	}
+
+	.setup-value {
+		padding-top: 0;
+		border-top: none;
+	}
+}

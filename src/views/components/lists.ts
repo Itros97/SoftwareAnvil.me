@@ -1,4 +1,4 @@
-import { Post, Project, formatPostDate } from "../../lib/content.js"
+import { Post, Project, SetupGroup, formatPostDate } from "../../lib/content.js"
 import { getTexts } from "../texts.js"
 import { createEmptyState, createLink, createTextElement } from "./elements.js"
 
@@ -18,6 +18,27 @@ export function createPostList(posts: Post[]): HTMLElement {
 	const list = createTextElement("ul", "", ["entry-list"])
 	posts.forEach(post => list.appendChild(createPostItem(post)))
 	return list
+}
+
+/** Create the setup groups, each as a titled list of label → value rows. */
+export function createSetupList(groups: SetupGroup[]): HTMLElement {
+	const container = createTextElement("div", "", ["setup"])
+	groups.forEach(group => container.appendChild(createSetupGroup(group)))
+	return container
+}
+
+/** Create one setup group: its title and a definition list of its rows. */
+function createSetupGroup(group: SetupGroup): HTMLElement {
+	const element = createTextElement("div", "", ["setup-group"])
+	element.appendChild(createTextElement("h3", group.title, ["setup-group-title"]))
+
+	const list = createTextElement("dl", "", ["setup-list"])
+	group.items.forEach(item => {
+		list.appendChild(createTextElement("dt", item.label, ["setup-label"]))
+		list.appendChild(createTextElement("dd", item.value, ["setup-value"]))
+	})
+	element.appendChild(list)
+	return element
 }
 
 /** Create one project row: name and year, description, tags. */

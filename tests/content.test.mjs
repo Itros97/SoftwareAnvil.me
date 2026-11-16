@@ -1,9 +1,10 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
-import { findPostBySlug, formatPostDate, sortPostsByDate, takeFeatured } from "../scripts/lib/content.js"
+import { filterNonEmptyGroups, findPostBySlug, formatPostDate, sortPostsByDate, takeFeatured } from "../scripts/lib/content.js"
 
 const post = (slug, date) => ({ slug, title: slug, date, summary: "" })
 const project = (name, featured) => ({ name, description: "", url: "", tags: [], year: 2025, featured })
+const group = (title, count) => ({ title, items: Array.from({ length: count }, (_, i) => ({ label: `l${i}`, value: `v${i}` })) })
 
 test("sortPostsByDate puts the most recent post first", () => {
 	const sorted = sortPostsByDate([post("old", "2024-01-10"), post("new", "2025-06-01"), post("mid", "2024-12-31")])
@@ -35,4 +36,13 @@ test("takeFeatured returns an empty list when nothing is featured", () => {
 
 test("formatPostDate keeps the calendar day regardless of timezone", () => {
 	assert.match(formatPostDate("2025-03-07", "en-US"), /Mar 7, 2025/)
+})
+
+test("filterNonEmptyGroups drops setup groups without items and keeps the order", () => {
+	const groups = [group("hardware", 2), group("empty", 0), group("monitors", 1)]
+	assert.deepEqual(filterNonEmptyGroups(groups).map(g => g.title), ["hardware", "monitors"])
+})
+
+test("filterNonEmptyGroups returns an empty list when every group is empty", () => {
+	assert.deepEqual(filterNonEmptyGroups([group("empty", 0)]), [])
 })

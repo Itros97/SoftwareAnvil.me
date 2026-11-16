@@ -1,5 +1,5 @@
 import { getConfiguration } from "../lib/configuration.js"
-import { Post, Profile, Project, sortPostsByDate } from "../lib/content.js"
+import { Post, Profile, Project, SetupGroup, filterNonEmptyGroups, sortPostsByDate } from "../lib/content.js"
 import { LanguageService } from "./languageservice.js"
 
 /** Loads the site content (profile, projects, posts) in the current language from the content folder. */
@@ -24,6 +24,16 @@ export default class ContentService {
 	/** Load the "about me" markdown. */
 	static async getAbout(): Promise<string> {
 		return ContentService.fetchText("about.md")
+	}
+
+	/** Load the computer setup groups; an empty list when the file is missing so the home page still renders. */
+	static async getSetup(): Promise<SetupGroup[]> {
+		try {
+			return filterNonEmptyGroups(JSON.parse(await ContentService.fetchText("setup.json")))
+		} catch (error) {
+			console.warn(error)
+			return []
+		}
 	}
 
 	/** Load the markdown body of a post. */
