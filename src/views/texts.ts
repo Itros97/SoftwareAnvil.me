@@ -23,6 +23,18 @@ const ES = {
 	NOT_FOUND_TITLE: "404",
 	NOT_FOUND_TEXT: "Esta página no existe.",
 	NOT_FOUND_LINK: "← Volver al inicio",
+	GAME_OPEN: "Abrir minijuego",
+	GAME_TITLE: "forge — terminal",
+	GAME_HELP: "Escribe cada comando tal cual. Tienes 30 segundos y el tiempo empieza con la primera tecla.",
+	GAME_INPUT_LABEL: "Escribe el comando",
+	GAME_CLOSE: "Cerrar",
+	GAME_SCORE: "puntos",
+	GAME_WPM: "ppm",
+	GAME_BEST: "récord",
+	GAME_NEXT: "siguiente",
+	GAME_OVER: "¡Tiempo!",
+	GAME_NEW_BEST: "¡Nuevo récord!",
+	GAME_RESTART: "Pulsa Enter para jugar otra vez · Esc para salir",
 }
 
 /** Every interface text; each language must define all of them. */
@@ -50,6 +62,18 @@ const EN: Texts = {
 	NOT_FOUND_TITLE: "404",
 	NOT_FOUND_TEXT: "This page does not exist.",
 	NOT_FOUND_LINK: "← Back to home",
+	GAME_OPEN: "Open minigame",
+	GAME_TITLE: "forge — terminal",
+	GAME_HELP: "Type each command exactly. You have 30 seconds, and the clock starts with your first keystroke.",
+	GAME_INPUT_LABEL: "Type the command",
+	GAME_CLOSE: "Close",
+	GAME_SCORE: "score",
+	GAME_WPM: "wpm",
+	GAME_BEST: "best",
+	GAME_NEXT: "next",
+	GAME_OVER: "Time's up!",
+	GAME_NEW_BEST: "New best score!",
+	GAME_RESTART: "Press Enter to play again · Esc to quit",
 }
 
 const TEXTS_BY_LANGUAGE: Record<LanguageCode, Texts> = { es: ES, en: EN }
