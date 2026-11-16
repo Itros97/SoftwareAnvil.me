@@ -542,7 +542,10 @@
         SETUP_LINK: "Ver mi setup →",
         CURIOSITIES_TITLE: "Curiosidades",
         CURIOSITIES_INTRO: "Pequeños experimentos con los que jugar directamente en la página.",
+        BACK_TO_CURIOSITIES: "← Volver a curiosidades",
+        CATEGORY_MATH: "Matemáticas",
         COLLATZ_TITLE: "Conjetura de Collatz",
+        COLLATZ_SUMMARY: "Divide entre 2 o multiplica por 3 y suma 1: ¿llegas siempre a 1?",
         COLLATZ_DESCRIPTION: "Elige un número. Si es par, divídelo entre 2; si es impar, multiplícalo por 3 y suma 1. Repite. La conjetura dice que siempre acabarás en 1, pero nadie lo ha demostrado.",
         COLLATZ_NUMBER_LABEL: "Número inicial",
         COLLATZ_RUN: "Calcular",
@@ -598,7 +601,10 @@
         SETUP_LINK: "See my setup →",
         CURIOSITIES_TITLE: "Curiosities",
         CURIOSITIES_INTRO: "Small experiments to play with right here on the page.",
+        BACK_TO_CURIOSITIES: "← Back to curiosities",
+        CATEGORY_MATH: "Mathematics",
         COLLATZ_TITLE: "Collatz conjecture",
+        COLLATZ_SUMMARY: "Halve it or triple it and add 1: do you always reach 1?",
         COLLATZ_DESCRIPTION: "Pick a number. If it is even, halve it; if it is odd, triple it and add 1. Repeat. The conjecture says you always end up at 1, but nobody has proved it.",
         COLLATZ_NUMBER_LABEL: "Starting number",
         COLLATZ_RUN: "Run",
@@ -2557,6 +2563,19 @@ ${body}</tbody>
     }
     SetupView.VIEW_ID = "setup";
 
+    /** Order in which categories appear on the index. */
+    const CATEGORY_ORDER = ["math"];
+    /** Group items by category following the given order; categories without items are left out. */
+    function groupByCategory(items, order) {
+        return order
+            .map(category => ({ category, items: items.filter(item => item.category == category) }))
+            .filter(group => group.items.length > 0);
+    }
+    /** Find the item with the given slug, if any. */
+    function findBySlug(items, slug) {
+        return items.find(item => item.slug == slug);
+    }
+
     /** Safety cap: every start below 10^6 reaches 1 in fewer than 600 steps. */
     const DEFAULT_MAX_STEPS = 10_000;
     /** The next Collatz term: half of an even number, 3n + 1 of an odd one. */
@@ -2708,12 +2727,10 @@ ${body}</tbody>
     const MAX_RANGE = 100_000;
     const PREVIEW_EDGE = 12;
     const EXAMPLES = [27, 97, 871];
-    /** Interactive card that walks a Collatz sequence and checks the conjecture over a range. */
-    function createCollatzCard() {
+    /** Interactive panel that walks a Collatz sequence and checks the conjecture over a range. */
+    function createCollatzExplorer() {
         const texts = getTexts();
-        const card = createTextElement("article", "", ["curiosity"]);
-        card.appendChild(createTextElement("h2", texts.COLLATZ_TITLE, ["curiosity-title"]));
-        card.appendChild(createTextElement("p", texts.COLLATZ_DESCRIPTION, ["curiosity-description"]));
+        const card = createTextElement("div", "", ["curiosity"]);
         const sequenceResult = createTextElement("div", "", ["collatz-result"]);
         sequenceResult.setAttribute("aria-live", "polite");
         const sequenceForm = createNumberForm({
@@ -2784,20 +2801,78 @@ ${body}</tbody>
         return value.toLocaleString(getTexts().LOCALE);
     }
 
-    /** Every curiosity card, in the order they appear; add new ones here. */
-    const CURIOSITIES = [createCollatzCard];
-    /** Page with small interactive experiments embedded in the site. */
+    /** Every curiosity, in the order they are listed inside their category; add new ones here. */
+    const CURIOSITIES = [
+        {
+            slug: "collatz",
+            category: "math",
+            title: "COLLATZ_TITLE",
+            summary: "COLLATZ_SUMMARY",
+            description: "COLLATZ_DESCRIPTION",
+            createContent: createCollatzExplorer,
+        },
+    ];
+    /** Text key of each category heading. */
+    const CATEGORY_TITLES = {
+        math: "CATEGORY_MATH",
+    };
+    /** The heading of a category in the current language. */
+    function getCategoryTitle(category) {
+        return getTexts()[CATEGORY_TITLES[category]];
+    }
+
+    /** Index of the curiosities, grouped by category, each linking to its own page. */
     class CuriositiesView {
-        /** Show the curiosities view. */
+        /** Show the curiosities index. */
         static async show(_parameters, container) {
             setPageTitle(getTexts().CURIOSITIES_TITLE);
             const page = createPage(CuriositiesView.VIEW_ID);
             page.appendChild(createPageHeader(getTexts().CURIOSITIES_TITLE, getTexts().CURIOSITIES_INTRO));
-            CURIOSITIES.forEach(createCard => page.appendChild(createCard()));
+            groupByCategory(CURIOSITIES, CATEGORY_ORDER)
+                .forEach(group => page.appendChild(CuriositiesView.createCategory(group.category, group.items)));
             container.appendChild(page);
+        }
+        /** Create one category section with the list of its curiosities. */
+        static createCategory(category, curiosities) {
+            const section = createTextElement("section", "", ["curiosity-category"]);
+            section.appendChild(createSectionHeader(getCategoryTitle(category)));
+            const list = createTextElement("ul", "", ["entry-list"]);
+            curiosities.forEach(curiosity => list.appendChild(CuriositiesView.createItem(curiosity)));
+            section.appendChild(list);
+            return section;
+        }
+        /** Create one row: title linking to the curiosity page, then its one-line summary. */
+        static createItem(curiosity) {
+            const texts = getTexts();
+            const item = createTextElement("li", "", ["entry"]);
+            const title = createTextElement("div", "", ["entry-title"]);
+            title.appendChild(createLink(texts[curiosity.title], `#/curiosities/${curiosity.slug}`, ["entry-link"]));
+            item.appendChild(title);
+            item.appendChild(createTextElement("p", texts[curiosity.summary], ["entry-description"]));
+            return item;
         }
     }
     CuriositiesView.VIEW_ID = "curiosities";
+
+    /** Page of a single curiosity. Expects its slug as the first route parameter. */
+    class CuriosityView {
+        /** Show the curiosity page, or the not found view when the slug is unknown. */
+        static async show(parameters, container) {
+            const curiosity = findBySlug(CURIOSITIES, parameters[0] ?? "");
+            if (!curiosity) {
+                await NotFoundView.show([], container);
+                return;
+            }
+            const texts = getTexts();
+            setPageTitle(texts[curiosity.title]);
+            const page = createPage(CuriosityView.VIEW_ID);
+            page.appendChild(createLink(texts.BACK_TO_CURIOSITIES, "#/curiosities", ["back-link"]));
+            page.appendChild(createPageHeader(texts[curiosity.title], texts[curiosity.description]));
+            page.appendChild(curiosity.createContent());
+            container.appendChild(page);
+        }
+    }
+    CuriosityView.VIEW_ID = "curiosity";
 
     let layout;
     window.addEventListener("hashchange", renderCurrentRoute);
@@ -2829,6 +2904,7 @@ ${body}</tbody>
         setRoute("blog/$", PostView.show);
         setRoute("setup", SetupView.show);
         setRoute("curiosities", CuriositiesView.show);
+        setRoute("curiosities/$", CuriosityView.show);
         setNotFoundRoute(NotFoundView.show);
     }
     /** Build the page shell once; the footer socials fill in when the profile loads. */

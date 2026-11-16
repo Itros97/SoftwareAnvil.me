@@ -7,12 +7,10 @@ const MAX_START = 1_000_000;
 const MAX_RANGE = 100_000;
 const PREVIEW_EDGE = 12;
 const EXAMPLES = [27, 97, 871];
-/** Interactive card that walks a Collatz sequence and checks the conjecture over a range. */
-export function createCollatzCard() {
+/** Interactive panel that walks a Collatz sequence and checks the conjecture over a range. */
+export function createCollatzExplorer() {
     const texts = getTexts();
-    const card = createTextElement("article", "", ["curiosity"]);
-    card.appendChild(createTextElement("h2", texts.COLLATZ_TITLE, ["curiosity-title"]));
-    card.appendChild(createTextElement("p", texts.COLLATZ_DESCRIPTION, ["curiosity-description"]));
+    const card = createTextElement("div", "", ["curiosity"]);
     const sequenceResult = createTextElement("div", "", ["collatz-result"]);
     sequenceResult.setAttribute("aria-live", "polite");
     const sequenceForm = createNumberForm({
