@@ -1,0 +1,9 @@
+.rectifier-hint {
+	min-height: 3.2em;
+}
+
+.rectifier-sliders {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+	gap: 1rem 1.5rem;
+}

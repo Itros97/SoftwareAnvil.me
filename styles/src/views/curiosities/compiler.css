@@ -1,0 +1,72 @@
+.compiler-input {
+	width: min(18rem, 100%);
+}
+
+.compiler-output {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	gap: 0.75rem;
+}
+
+.compiler-stage {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--background);
+}
+
+.compiler-stage-title {
+	color: var(--text-muted);
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.compiler-tokens {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+}
+
+.compiler-token {
+	padding: 0.1rem 0.45rem;
+	border-radius: 0.3rem;
+	background: var(--surface-1);
+	font-family: var(--font-console);
+	font-size: 0.85rem;
+}
+
+.compiler-token.is-operator {
+	color: var(--accent);
+}
+
+.compiler-code {
+	margin: 0;
+	overflow-x: auto;
+	font-family: var(--font-console);
+	font-size: 0.85rem;
+	line-height: 1.5;
+	white-space: pre;
+}
+
+.compiler-result {
+	color: var(--accent);
+	font-family: var(--font-console);
+	font-size: 1.15rem;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.compiler-note,
+.compiler-output > .number-form-error,
+.compiler-pointer {
+	grid-column: 1 / -1;
+}
+
+.compiler-pointer {
+	color: var(--error);
+}

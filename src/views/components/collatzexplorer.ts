@@ -1,5 +1,6 @@
 import { collatzSequence, previewSequence, summarizeSequence, verifyRange } from "../../lib/collatz.js"
 import { fillText, getTexts } from "../texts.js"
+import { createExampleRow, createStat } from "./curiosityparts.js"
 import { createTextElement } from "./elements.js"
 import { createLineChart } from "./linechart.js"
 import { createNumberForm } from "./numberform.js"
@@ -24,7 +25,8 @@ export function createCollatzExplorer(): HTMLElement {
 		initial: EXAMPLES[0],
 		onSubmit: start => sequenceResult.replaceChildren(...createSequenceResult(start)),
 	})
-	card.append(sequenceForm.element, createExamples(sequenceForm.submitValue), sequenceResult)
+	const examples = createExampleRow(texts.COLLATZ_EXAMPLES, EXAMPLES.map(String), example => sequenceForm.submitValue(Number(example)))
+	card.append(sequenceForm.element, examples, sequenceResult)
 
 	const rangeResult = createTextElement("p", "", ["collatz-range-result"])
 	rangeResult.setAttribute("aria-live", "polite")
@@ -43,45 +45,22 @@ export function createCollatzExplorer(): HTMLElement {
 	return card
 }
 
-/** Create the "Try: 27 97 871" row of buttons that run an example start. */
-function createExamples(run: (value: number) => void): HTMLElement {
-	const row = createTextElement("div", "", ["collatz-examples"])
-	row.appendChild(createTextElement("span", getTexts().COLLATZ_EXAMPLES))
-	EXAMPLES.forEach(example => {
-		const button = createTextElement("button", String(example), ["collatz-example"])
-		button.setAttribute("type", "button")
-		button.addEventListener("click", () => run(example))
-		row.appendChild(button)
-	})
-	return row
-}
-
 /** Create the stats, the shortened sequence and the trajectory chart for one start. */
 function createSequenceResult(start: number): Element[] {
 	const texts = getTexts()
 	const sequence = collatzSequence(start)
 	const summary = summarizeSequence(sequence)
 
-	const stats = createTextElement("p", "", ["collatz-stats"])
+	const stats = createTextElement("p", "", ["curiosity-stats"])
 	stats.append(
-		createStat(summary.steps, texts.COLLATZ_STEPS),
-		createStat(summary.peak, texts.COLLATZ_PEAK),
+		createStat(formatNumber(summary.steps), texts.COLLATZ_STEPS),
+		createStat(formatNumber(summary.peak), texts.COLLATZ_PEAK),
 	)
 
 	const terms = previewSequence(sequence, PREVIEW_EDGE).map(term => term == null ? "…" : formatNumber(term))
 	const preview = createTextElement("p", terms.join(" → "), ["collatz-sequence"])
 	const chart = createLineChart(sequence, fillText(texts.COLLATZ_CHART_LABEL, { n: formatNumber(start) }))
 	return [stats, preview, chart]
-}
-
-/** Create one big number with its caption. */
-function createStat(value: number, caption: string): HTMLElement {
-	const stat = createTextElement("span", "", ["collatz-stat"])
-	stat.append(
-		createTextElement("strong", formatNumber(value), ["collatz-stat-value"]),
-		createTextElement("span", caption, ["collatz-stat-caption"]),
-	)
-	return stat
 }
 
 /** Check every start up to limit and describe the outcome. */
