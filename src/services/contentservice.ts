@@ -26,14 +26,9 @@ export default class ContentService {
 		return ContentService.fetchText("about.md")
 	}
 
-	/** Load the computer setup groups; an empty list when the file is missing so the home page still renders. */
+	/** Load the computer setup groups, skipping the empty ones. */
 	static async getSetup(): Promise<SetupGroup[]> {
-		try {
-			return filterNonEmptyGroups(JSON.parse(await ContentService.fetchText("setup.json")))
-		} catch (error) {
-			console.warn(error)
-			return []
-		}
+		return filterNonEmptyGroups(JSON.parse(await ContentService.fetchText("setup.json")))
 	}
 
 	/** Load the markdown body of a post. */

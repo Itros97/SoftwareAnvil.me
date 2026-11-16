@@ -1,0 +1,126 @@
+.fetch {
+	--fetch-bg: #1b1817;
+	--fetch-bar: #24201e;
+	--fetch-text: #e7e5e4;
+	--fetch-muted: #8a837d;
+	--fetch-border: #2f2b28;
+	--fetch-color: #a9dc76;
+	overflow: hidden;
+	border: 1px solid var(--fetch-border);
+	border-radius: 0.75rem;
+	background: var(--fetch-bg);
+	color: var(--fetch-text);
+	font-family: var(--font-console);
+	font-size: 0.85rem;
+	box-shadow: 0 1rem 3rem rgb(0 0 0 / 0.25);
+}
+
+.fetch-titlebar {
+	padding: 0.55rem 1rem;
+	background: var(--fetch-bar);
+	color: var(--fetch-muted);
+	font-size: 0.8rem;
+}
+
+.fetch-body {
+	display: flex;
+	align-items: flex-start;
+	gap: 1.5rem;
+	padding: 1.75rem 1.25rem 1.5rem;
+}
+
+.fetch-logo {
+	flex-shrink: 0;
+	width: 9rem;
+	height: auto;
+}
+
+.fetch-boxes {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 1.75rem;
+	min-width: 0;
+}
+
+.fetch-box {
+	position: relative;
+	padding: 1rem 0.9rem 0.75rem;
+	border: 1px solid color-mix(in srgb, var(--fetch-color) 45%, transparent);
+	border-radius: 0.4rem;
+}
+
+.fetch-box:nth-child(2) {
+	--fetch-color: #fc9867;
+}
+
+.fetch-box:nth-child(3) {
+	--fetch-color: #78dce8;
+}
+
+.fetch-box-title {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	padding: 0 0.5rem;
+	background: var(--fetch-bg);
+	color: var(--fetch-muted);
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: 400;
+	letter-spacing: 0;
+	transform: translate(-50%, -50%);
+}
+
+.fetch-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.45rem;
+	line-height: 1.6;
+}
+
+.fetch-row-root {
+	color: var(--fetch-color);
+	font-weight: 600;
+}
+
+.fetch-branch,
+.fetch-icon {
+	flex-shrink: 0;
+	color: var(--fetch-color);
+}
+
+.fetch-icon {
+	display: grid;
+	height: 1.6em;
+	place-items: center;
+}
+
+.fetch-value {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.fetch-label {
+	color: var(--fetch-muted);
+	font-weight: 400;
+}
+
+.about-setup-link {
+	display: inline-block;
+	margin-top: 1rem;
+}
+
+@media (max-width: 36rem) {
+	.fetch-logo {
+		display: none;
+	}
+
+	.fetch-body {
+		padding: 1.5rem 0.75rem 1rem;
+	}
+
+	.fetch {
+		font-size: 0.8rem;
+	}
+}

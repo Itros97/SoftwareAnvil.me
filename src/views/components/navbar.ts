@@ -18,6 +18,7 @@ export class Navbar {
 			{ text: texts.NAV_HOME, section: "" },
 			{ text: texts.NAV_PROJECTS, section: "projects" },
 			{ text: texts.NAV_BLOG, section: "blog" },
+			{ text: texts.NAV_SETUP, section: "setup" },
 		]
 
 		const header = createTextElement("header", "", ["navbar"])

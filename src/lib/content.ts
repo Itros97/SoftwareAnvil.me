@@ -31,10 +31,11 @@ export interface Profile {
 	socials: Social[]
 }
 
-/** One row of the setup section, such as "CPU" → "AMD Ryzen 7 7700X". */
+/** One row of the setup page, such as "AMD Ryzen 7 7700X" (CPU) with a material icon key. */
 export interface SetupItem {
 	label: string
 	value: string
+	icon?: string
 }
 
 /** A titled group of setup rows, such as "Hardware" or "Monitors". */
@@ -70,4 +71,10 @@ export function formatPostDate(isoDate: string, locale: string): string {
 /** Return the setup groups that have at least one item, keeping their order. */
 export function filterNonEmptyGroups(groups: SetupGroup[]): SetupGroup[] {
 	return groups.filter(group => group.items.length > 0)
+}
+
+/** Return the tree branch drawn before a setup row: none for the root (first) row, a corner for the last one. */
+export function getTreeBranch(index: number, count: number): string {
+	if (index == 0) return ""
+	return index == count - 1 ? "└─" : "├─"
 }

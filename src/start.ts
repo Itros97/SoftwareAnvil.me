@@ -13,6 +13,7 @@ import HomeView from "./views/home.js"
 import NotFoundView from "./views/notfound.js"
 import PostView from "./views/post.js"
 import ProjectsView from "./views/projects.js"
+import SetupView from "./views/setup.js"
 
 /** The persistent page shell: navbar, the container where views render, footer. */
 interface Layout {
@@ -54,6 +55,7 @@ function registerRoutes(): void {
 	setRoute("projects", ProjectsView.show)
 	setRoute("blog", BlogView.show)
 	setRoute("blog/$", PostView.show)
+	setRoute("setup", SetupView.show)
 	setNotFoundRoute(NotFoundView.show)
 }
 

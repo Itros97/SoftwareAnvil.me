@@ -1,6 +1,6 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
-import { filterNonEmptyGroups, findPostBySlug, formatPostDate, sortPostsByDate, takeFeatured } from "../scripts/lib/content.js"
+import { filterNonEmptyGroups, findPostBySlug, getTreeBranch, formatPostDate, sortPostsByDate, takeFeatured } from "../scripts/lib/content.js"
 
 const post = (slug, date) => ({ slug, title: slug, date, summary: "" })
 const project = (name, featured) => ({ name, description: "", url: "", tags: [], year: 2025, featured })
@@ -45,4 +45,12 @@ test("filterNonEmptyGroups drops setup groups without items and keeps the order"
 
 test("filterNonEmptyGroups returns an empty list when every group is empty", () => {
 	assert.deepEqual(filterNonEmptyGroups([group("empty", 0)]), [])
+})
+
+test("getTreeBranch leaves the root row without a branch", () => {
+	assert.equal(getTreeBranch(0, 4), "")
+})
+
+test("getTreeBranch uses a middle branch for inner rows and a corner for the last one", () => {
+	assert.deepEqual([1, 2, 3].map(index => getTreeBranch(index, 4)), ["├─", "├─", "└─"])
 })
