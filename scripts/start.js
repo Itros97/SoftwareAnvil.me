@@ -544,6 +544,69 @@
         CURIOSITIES_INTRO: "Pequeños experimentos con los que jugar directamente en la página.",
         BACK_TO_CURIOSITIES: "← Volver a curiosidades",
         CATEGORY_MATH: "Matemáticas",
+        CURIOSITY_TRY: "Probar →",
+        CATEGORY_PHYSICS: "Física",
+        CATEGORY_PROGRAMMING: "Programación",
+        PRIMES_TITLE: "Números primos",
+        PRIMES_SUMMARY: "Tacha múltiplos con la criba de Eratóstenes y descubre las diagonales de la espiral de Ulam.",
+        PRIMES_DESCRIPTION: "Un primo solo es divisible entre 1 y entre sí mismo. Parecen repartirse al azar, pero esconden patrones que todavía no entendemos del todo.",
+        SIEVE_TITLE: "Criba de Eratóstenes",
+        SIEVE_INTRO: "Un método de hace más de 2.000 años: cada primo tacha sus múltiplos, y lo que queda sin tachar son primos.",
+        SIEVE_NEXT: "Siguiente paso",
+        SIEVE_PLAY: "Reproducir",
+        SIEVE_PAUSE: "Pausa",
+        SIEVE_RESET: "Reiniciar",
+        SIEVE_START: "Pulsa «Siguiente paso» o «Reproducir» para empezar.",
+        SIEVE_STEP: "El {prime} es primo: tacha {count} múltiplos que quedaban.",
+        SIEVE_DONE: "Lo que queda sin tachar son primos: {count} hasta el {limit}.",
+        SIEVE_GRID_LABEL: "Números del 1 al {limit}",
+        ULAM_TITLE: "Espiral de Ulam",
+        ULAM_INTRO: "Escribe los números en espiral desde el centro y marca los primos: aparecen diagonales. Stanisław Ulam lo descubrió en 1963 garabateando en una conferencia aburrida.",
+        ULAM_SIZE: "Tamaño",
+        ULAM_LABEL: "Espiral de Ulam de {side} × {side} con {count} primos marcados",
+        RECT_TITLE: "De alterna a continua",
+        RECT_SUMMARY: "Rectifica una onda de corriente alterna paso a paso hasta casi continua.",
+        RECT_DESCRIPTION: "Los enchufes dan corriente alterna, pero los aparatos electrónicos necesitan continua. Un rectificador con diodos y un condensador la convierte paso a paso.",
+        RECT_STAGES: "Etapa",
+        RECT_STAGE_AC: "Alterna",
+        RECT_STAGE_HALF: "Media onda",
+        RECT_STAGE_FULL: "Onda completa",
+        RECT_STAGE_FILTERED: "Filtrada",
+        RECT_HINT_AC: "La tensión sube y baja siguiendo un seno: la mitad del tiempo es negativa y su media es cero.",
+        RECT_HINT_HALF: "Un diodo solo deja pasar la corriente en un sentido: se queda la mitad positiva y se pierde la otra.",
+        RECT_HINT_FULL: "Un puente de cuatro diodos da la vuelta a la mitad negativa: todo es positivo, pero sigue latiendo.",
+        RECT_HINT_FILTERED: "Un condensador se carga en cada pico y se descarga despacio entre ellos: queda casi plana, con un pequeño rizado.",
+        RECT_AMPLITUDE: "Amplitud",
+        RECT_FREQUENCY: "Frecuencia",
+        RECT_CAPACITANCE: "Condensador",
+        RECT_AVERAGE: "V media",
+        RECT_RMS: "V eficaz (rms)",
+        RECT_RIPPLE: "rizado pico a pico",
+        RECT_CHART_LABEL: "Tensión de la etapa {stage} durante tres periodos",
+        RECT_NOTE: "Modelo simplificado: diodos ideales sin caída de tensión y una carga fija de 1 kΩ.",
+        COMPILER_TITLE: "Minicompilador",
+        COMPILER_SUMMARY: "Mira cómo una expresión pasa por tokens, árbol y bytecode, y por qué 0.1 + 0.2 no da 0.3.",
+        COMPILER_DESCRIPTION: "Un compilador de juguete para expresiones aritméticas. Hace lo mismo que uno de verdad: trocea el texto, construye un árbol, lo traduce a instrucciones y una máquina de pila las ejecuta.",
+        COMPILER_INPUT_LABEL: "Expresión",
+        COMPILER_RUN: "Compilar",
+        COMPILER_EXAMPLES: "Curiosidades:",
+        COMPILER_TOKENS: "1 · Tokens",
+        COMPILER_TREE: "2 · Árbol (AST)",
+        COMPILER_BYTECODE: "3 · Bytecode",
+        COMPILER_RESULT: "4 · Resultado",
+        COMPILER_ERROR_EMPTY: "Escribe una expresión.",
+        COMPILER_ERROR_TOO_LONG: "La expresión es demasiado larga.",
+        COMPILER_ERROR_UNEXPECTED_CHAR: "Este carácter no forma parte del lenguaje.",
+        COMPILER_ERROR_UNEXPECTED_TOKEN: "No esperaba esto aquí.",
+        COMPILER_ERROR_UNEXPECTED_END: "La expresión termina antes de tiempo.",
+        COMPILER_ERROR_MISSING_PAREN: "Falta cerrar un paréntesis.",
+        EXAMPLE_FLOAT: "Los decimales se guardan en binario y 0.1 no tiene representación exacta, igual que 1/3 no la tiene en decimal. El error se arrastra a la suma.",
+        EXAMPLE_POWER: "La potencia se agrupa por la derecha: es 2^(3^2) = 2^9, no (2^3)^2 = 64. Fíjate en el árbol.",
+        EXAMPLE_NEGATE: "El menos unario tiene menos prioridad que la potencia, así que es -(2^2). Python hace lo mismo; Excel da 4.",
+        EXAMPLE_INFINITY: "En coma flotante (IEEE 754) dividir entre cero no es un error: da infinito.",
+        EXAMPLE_NAN: "0/0 no tiene un valor razonable, así que da NaN (\"no es un número\"), que curiosamente es de tipo número.",
+        EXAMPLE_SAFE_INTEGER: "Por encima de 2^53 los números de 64 bits ya no pueden representar todos los enteros: sumar 1 no cambia nada.",
+        EXAMPLE_MODULO: "El resto toma el signo del dividendo en JavaScript, C y Java (da 1). En Python, 7 % -3 da -2.",
         COLLATZ_TITLE: "Conjetura de Collatz",
         COLLATZ_SUMMARY: "Divide entre 2 o multiplica por 3 y suma 1: ¿llegas siempre a 1?",
         COLLATZ_DESCRIPTION: "Elige un número. Si es par, divídelo entre 2; si es impar, multiplícalo por 3 y suma 1. Repite. La conjetura dice que siempre acabarás en 1, pero nadie lo ha demostrado.",
@@ -603,6 +666,69 @@
         CURIOSITIES_INTRO: "Small experiments to play with right here on the page.",
         BACK_TO_CURIOSITIES: "← Back to curiosities",
         CATEGORY_MATH: "Mathematics",
+        CURIOSITY_TRY: "Try it →",
+        CATEGORY_PHYSICS: "Physics",
+        CATEGORY_PROGRAMMING: "Programming",
+        PRIMES_TITLE: "Prime numbers",
+        PRIMES_SUMMARY: "Cross out multiples with the sieve of Eratosthenes and spot the diagonals of the Ulam spiral.",
+        PRIMES_DESCRIPTION: "A prime is only divisible by 1 and by itself. They look randomly scattered, yet they hide patterns we still do not fully understand.",
+        SIEVE_TITLE: "Sieve of Eratosthenes",
+        SIEVE_INTRO: "A method over 2,000 years old: each prime crosses out its multiples, and whatever is left is prime.",
+        SIEVE_NEXT: "Next step",
+        SIEVE_PLAY: "Play",
+        SIEVE_PAUSE: "Pause",
+        SIEVE_RESET: "Reset",
+        SIEVE_START: "Press \"Next step\" or \"Play\" to start.",
+        SIEVE_STEP: "{prime} is prime: it crosses out {count} remaining multiples.",
+        SIEVE_DONE: "Whatever is not crossed out is prime: {count} up to {limit}.",
+        SIEVE_GRID_LABEL: "Numbers from 1 to {limit}",
+        ULAM_TITLE: "Ulam spiral",
+        ULAM_INTRO: "Write the numbers in a spiral from the centre and mark the primes: diagonals show up. Stanisław Ulam found it in 1963 while doodling through a boring talk.",
+        ULAM_SIZE: "Size",
+        ULAM_LABEL: "Ulam spiral of {side} × {side} with {count} primes marked",
+        RECT_TITLE: "From AC to DC",
+        RECT_SUMMARY: "Rectify an alternating current wave step by step until it is almost direct.",
+        RECT_DESCRIPTION: "Wall sockets give alternating current, but electronics need direct current. A rectifier made of diodes and a capacitor converts it step by step.",
+        RECT_STAGES: "Stage",
+        RECT_STAGE_AC: "AC",
+        RECT_STAGE_HALF: "Half wave",
+        RECT_STAGE_FULL: "Full wave",
+        RECT_STAGE_FILTERED: "Filtered",
+        RECT_HINT_AC: "The voltage rises and falls following a sine: half the time it is negative, and it averages zero.",
+        RECT_HINT_HALF: "A diode only lets current through one way: the positive half stays and the other is lost.",
+        RECT_HINT_FULL: "A bridge of four diodes flips the negative half: everything is positive, but it still pulses.",
+        RECT_HINT_FILTERED: "A capacitor charges at each peak and slowly discharges between them: it is almost flat, with a small ripple.",
+        RECT_AMPLITUDE: "Amplitude",
+        RECT_FREQUENCY: "Frequency",
+        RECT_CAPACITANCE: "Capacitor",
+        RECT_AVERAGE: "average V",
+        RECT_RMS: "RMS V",
+        RECT_RIPPLE: "peak-to-peak ripple",
+        RECT_CHART_LABEL: "Voltage of the {stage} stage over three periods",
+        RECT_NOTE: "Simplified model: ideal diodes with no voltage drop and a fixed 1 kΩ load.",
+        COMPILER_TITLE: "Mini compiler",
+        COMPILER_SUMMARY: "Watch an expression go through tokens, tree and bytecode, and see why 0.1 + 0.2 is not 0.3.",
+        COMPILER_DESCRIPTION: "A toy compiler for arithmetic expressions. It does what a real one does: it splits the text, builds a tree, translates it into instructions and a stack machine runs them.",
+        COMPILER_INPUT_LABEL: "Expression",
+        COMPILER_RUN: "Compile",
+        COMPILER_EXAMPLES: "Curiosities:",
+        COMPILER_TOKENS: "1 · Tokens",
+        COMPILER_TREE: "2 · Tree (AST)",
+        COMPILER_BYTECODE: "3 · Bytecode",
+        COMPILER_RESULT: "4 · Result",
+        COMPILER_ERROR_EMPTY: "Type an expression.",
+        COMPILER_ERROR_TOO_LONG: "The expression is too long.",
+        COMPILER_ERROR_UNEXPECTED_CHAR: "This character is not part of the language.",
+        COMPILER_ERROR_UNEXPECTED_TOKEN: "Did not expect this here.",
+        COMPILER_ERROR_UNEXPECTED_END: "The expression ends too soon.",
+        COMPILER_ERROR_MISSING_PAREN: "A parenthesis is never closed.",
+        EXAMPLE_FLOAT: "Decimals are stored in binary and 0.1 has no exact representation, just like 1/3 has none in decimal. The error carries into the sum.",
+        EXAMPLE_POWER: "Power groups from the right: it is 2^(3^2) = 2^9, not (2^3)^2 = 64. Look at the tree.",
+        EXAMPLE_NEGATE: "Unary minus has lower priority than power, so it is -(2^2). Python agrees; Excel says 4.",
+        EXAMPLE_INFINITY: "In floating point (IEEE 754) dividing by zero is not an error: it gives infinity.",
+        EXAMPLE_NAN: "0/0 has no sensible value, so it gives NaN (\"not a number\"), which is, funnily, of type number.",
+        EXAMPLE_SAFE_INTEGER: "Above 2^53, 64-bit numbers can no longer hold every integer: adding 1 changes nothing.",
+        EXAMPLE_MODULO: "The remainder takes the sign of the dividend in JavaScript, C and Java (it gives 1). In Python, 7 % -3 gives -2.",
         COLLATZ_TITLE: "Collatz conjecture",
         COLLATZ_SUMMARY: "Halve it or triple it and add 1: do you always reach 1?",
         COLLATZ_DESCRIPTION: "Pick a number. If it is even, halve it; if it is odd, triple it and add 1. Repeat. The conjecture says you always end up at 1, but nobody has proved it.",
@@ -2564,7 +2690,7 @@ ${body}</tbody>
     SetupView.VIEW_ID = "setup";
 
     /** Order in which categories appear on the index. */
-    const CATEGORY_ORDER = ["math"];
+    const CATEGORY_ORDER = ["math", "physics", "programming"];
     /** Group items by category following the given order; categories without items are left out. */
     function groupByCategory(items, order) {
         return order
@@ -2627,35 +2753,55 @@ ${body}</tbody>
         return [...sequence.slice(0, edge), null, ...sequence.slice(-edge)];
     }
 
-    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+    /** Create one big value with its caption underneath. */
+    function createStat(value, caption) {
+        const stat = createTextElement("span", "", ["curiosity-stat"]);
+        stat.append(createTextElement("strong", value, ["curiosity-stat-value"]), createTextElement("span", caption, ["curiosity-stat-caption"]));
+        return stat;
+    }
+    /** Create a row of example buttons after a label; clicking one hands its text to onPick. */
+    function createExampleRow(label, examples, onPick) {
+        const row = createTextElement("div", "", ["curiosity-examples"]);
+        row.appendChild(createTextElement("span", label));
+        examples.forEach(example => {
+            const button = createTextElement("button", example, ["curiosity-example"]);
+            button.setAttribute("type", "button");
+            button.addEventListener("click", () => onPick(example));
+            row.appendChild(button);
+        });
+        return row;
+    }
+
+    const SVG_NAMESPACE$1 = "http://www.w3.org/2000/svg";
     const WIDTH = 600;
     const HEIGHT = 160;
     const PADDING = 6;
     /** Create a minimal SVG line chart of the values in order: index on X, value on Y, scaled to fit. */
-    function createLineChart(values, label) {
-        const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+    function createLineChart(values, label, options = {}) {
+        const svg = document.createElementNS(SVG_NAMESPACE$1, "svg");
         svg.setAttribute("viewBox", `0 0 ${WIDTH} ${HEIGHT}`);
         svg.setAttribute("preserveAspectRatio", "none");
         svg.setAttribute("role", "img");
         svg.setAttribute("aria-label", label);
         svg.classList.add("line-chart");
-        const line = document.createElementNS(SVG_NAMESPACE, "polyline");
-        line.setAttribute("points", toPoints(values).join(" "));
-        line.setAttribute("vector-effect", "non-scaling-stroke");
-        line.classList.add("line-chart-line");
-        svg.appendChild(line);
+        const min = options.min ?? Math.min(...values);
+        const max = options.max ?? Math.max(...values);
+        const toY = (value) => HEIGHT - PADDING - ((value - min) / (max - min || 1)) * (HEIGHT - PADDING * 2);
+        if (options.baseline !== undefined) {
+            const y = toY(options.baseline).toFixed(1);
+            svg.appendChild(createSvgElement("line", { x1: "0", x2: String(WIDTH), y1: y, y2: y, class: "line-chart-baseline" }));
+        }
+        const stepX = (WIDTH - PADDING * 2) / Math.max(values.length - 1, 1);
+        const points = values.map((value, index) => `${(PADDING + index * stepX).toFixed(1)},${toY(value).toFixed(1)}`);
+        svg.appendChild(createSvgElement("polyline", { points: points.join(" "), class: "line-chart-line" }));
         return svg;
     }
-    /** Map each value to "x,y" inside the padded drawing area; y grows downwards in SVG. */
-    function toPoints(values) {
-        const min = Math.min(...values);
-        const range = Math.max(...values) - min || 1;
-        const stepX = (WIDTH - PADDING * 2) / Math.max(values.length - 1, 1);
-        return values.map((value, index) => {
-            const x = PADDING + index * stepX;
-            const y = HEIGHT - PADDING - ((value - min) / range) * (HEIGHT - PADDING * 2);
-            return `${x.toFixed(1)},${y.toFixed(1)}`;
-        });
+    /** Create an SVG element whose strokes keep their width when the chart stretches. */
+    function createSvgElement(type, attributes) {
+        const element = document.createElementNS(SVG_NAMESPACE$1, type);
+        Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+        element.setAttribute("vector-effect", "non-scaling-stroke");
+        return element;
     }
 
     /** Read a whole number written in plain digits that must lie within [min, max]. */
@@ -2726,7 +2872,7 @@ ${body}</tbody>
     const MAX_START = 1_000_000;
     const MAX_RANGE = 100_000;
     const PREVIEW_EDGE = 12;
-    const EXAMPLES = [27, 97, 871];
+    const EXAMPLES$1 = [27, 97, 871];
     /** Interactive panel that walks a Collatz sequence and checks the conjecture over a range. */
     function createCollatzExplorer() {
         const texts = getTexts();
@@ -2738,10 +2884,11 @@ ${body}</tbody>
             button: texts.COLLATZ_RUN,
             min: 1,
             max: MAX_START,
-            initial: EXAMPLES[0],
+            initial: EXAMPLES$1[0],
             onSubmit: start => sequenceResult.replaceChildren(...createSequenceResult(start)),
         });
-        card.append(sequenceForm.element, createExamples(sequenceForm.submitValue), sequenceResult);
+        const examples = createExampleRow(texts.COLLATZ_EXAMPLES, EXAMPLES$1.map(String), example => sequenceForm.submitValue(Number(example)));
+        card.append(sequenceForm.element, examples, sequenceResult);
         const rangeResult = createTextElement("p", "", ["collatz-range-result"]);
         rangeResult.setAttribute("aria-live", "polite");
         const rangeForm = createNumberForm({
@@ -2754,38 +2901,20 @@ ${body}</tbody>
         });
         card.append(rangeForm.element, rangeResult);
         // The form is still detached here, so render the first example directly instead of submitting it
-        sequenceResult.replaceChildren(...createSequenceResult(EXAMPLES[0]));
+        sequenceResult.replaceChildren(...createSequenceResult(EXAMPLES$1[0]));
         return card;
-    }
-    /** Create the "Try: 27 97 871" row of buttons that run an example start. */
-    function createExamples(run) {
-        const row = createTextElement("div", "", ["collatz-examples"]);
-        row.appendChild(createTextElement("span", getTexts().COLLATZ_EXAMPLES));
-        EXAMPLES.forEach(example => {
-            const button = createTextElement("button", String(example), ["collatz-example"]);
-            button.setAttribute("type", "button");
-            button.addEventListener("click", () => run(example));
-            row.appendChild(button);
-        });
-        return row;
     }
     /** Create the stats, the shortened sequence and the trajectory chart for one start. */
     function createSequenceResult(start) {
         const texts = getTexts();
         const sequence = collatzSequence(start);
         const summary = summarizeSequence(sequence);
-        const stats = createTextElement("p", "", ["collatz-stats"]);
-        stats.append(createStat(summary.steps, texts.COLLATZ_STEPS), createStat(summary.peak, texts.COLLATZ_PEAK));
+        const stats = createTextElement("p", "", ["curiosity-stats"]);
+        stats.append(createStat(formatNumber(summary.steps), texts.COLLATZ_STEPS), createStat(formatNumber(summary.peak), texts.COLLATZ_PEAK));
         const terms = previewSequence(sequence, PREVIEW_EDGE).map(term => term == null ? "…" : formatNumber(term));
         const preview = createTextElement("p", terms.join(" → "), ["collatz-sequence"]);
         const chart = createLineChart(sequence, fillText(texts.COLLATZ_CHART_LABEL, { n: formatNumber(start) }));
         return [stats, preview, chart];
-    }
-    /** Create one big number with its caption. */
-    function createStat(value, caption) {
-        const stat = createTextElement("span", "", ["collatz-stat"]);
-        stat.append(createTextElement("strong", formatNumber(value), ["collatz-stat-value"]), createTextElement("span", caption, ["collatz-stat-caption"]));
-        return stat;
     }
     /** Check every start up to limit and describe the outcome. */
     function describeRange(limit) {
@@ -2801,6 +2930,583 @@ ${body}</tbody>
         return value.toLocaleString(getTexts().LOCALE);
     }
 
+    const OPCODES = { "+": "ADD", "-": "SUB", "*": "MUL", "/": "DIV", "%": "MOD", "^": "POW" };
+    /** Turn a syntax tree into stack instructions: operands first, then the operation (postfix order). */
+    function compile(node) {
+        switch (node.type) {
+            case "number": return [{ op: "PUSH", value: node.value }];
+            case "negate": return [...compile(node.operand), { op: "NEG" }];
+            case "binary": return [...compile(node.left), ...compile(node.right), { op: OPCODES[node.operator] }];
+        }
+    }
+
+    /** A syntax error with the position in the source where it was found. */
+    class CompileError extends Error {
+        constructor(code, position) {
+            super(`${code} at position ${position}`);
+            this.name = "CompileError";
+            this.code = code;
+            this.position = position;
+        }
+    }
+
+    /** Draw a syntax tree as text lines with box-drawing branches. */
+    function formatTree(node) {
+        return formatBranch(node, "", "");
+    }
+    /** Draw one node with the given prefix for its own line and for the lines of its children. */
+    function formatBranch(node, linePrefix, childPrefix) {
+        const children = getChildren(node);
+        const lines = [linePrefix + getLabel(node)];
+        children.forEach((child, index) => {
+            const isLast = index == children.length - 1;
+            lines.push(...formatBranch(child, childPrefix + (isLast ? "└─ " : "├─ "), childPrefix + (isLast ? "   " : "│  ")));
+        });
+        return lines;
+    }
+    /** The text shown for a node. */
+    function getLabel(node) {
+        switch (node.type) {
+            case "number": return String(node.value);
+            case "negate": return "neg";
+            case "binary": return node.operator;
+        }
+    }
+    /** The operands of a node, left to right. */
+    function getChildren(node) {
+        switch (node.type) {
+            case "number": return [];
+            case "negate": return [node.operand];
+            case "binary": return [node.left, node.right];
+        }
+    }
+    /** Write an instruction like assembly: opcode and optional operand. */
+    function formatInstruction(instruction) {
+        return instruction.op == "PUSH" ? `PUSH ${instruction.value}` : instruction.op;
+    }
+
+    /** Longest source the compiler accepts, to keep the views readable. */
+    const MAX_SOURCE_LENGTH = 200;
+    const TOKEN_PATTERN = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|([+\-*/%^])|([()]))/y;
+    /** Split a source text into tokens, failing on any character that is not part of the language. */
+    function tokenize(source) {
+        if (source.length > MAX_SOURCE_LENGTH)
+            throw new CompileError("too-long", MAX_SOURCE_LENGTH);
+        const tokens = [];
+        let index = 0;
+        while (index < source.trimEnd().length) {
+            TOKEN_PATTERN.lastIndex = index;
+            const match = TOKEN_PATTERN.exec(source);
+            if (!match)
+                throw new CompileError("unexpected-char", firstNonSpace(source, index));
+            const [whole, number, operator, paren] = match;
+            const position = index + whole.length - (number ?? operator ?? paren).length;
+            if (number)
+                tokens.push({ type: "number", text: number, position });
+            else if (operator)
+                tokens.push({ type: "operator", text: operator, position });
+            else
+                tokens.push({ type: "paren", text: paren, position });
+            index += whole.length;
+        }
+        return tokens;
+    }
+    /** Position of the first non-space character from index on. */
+    function firstNonSpace(source, index) {
+        while (/\s/.test(source[index] ?? ""))
+            index++;
+        return index;
+    }
+
+    /** How tightly each binary operator holds its operands; higher wins. */
+    const BINDING_POWER = { "+": 10, "-": 10, "*": 20, "/": 20, "%": 20, "^": 40 };
+    /** Unary minus sits between products and powers, so -2^2 is -(2^2). */
+    const NEGATE_POWER = 30;
+    /** Build the syntax tree of a token list with a Pratt parser. */
+    function parse(tokens) {
+        if (tokens.length == 0)
+            throw new CompileError("empty", 0);
+        const last = tokens[tokens.length - 1];
+        const end = last.position + last.text.length;
+        let index = 0;
+        const peek = () => tokens[index];
+        const next = () => {
+            const token = tokens[index++];
+            if (!token)
+                throw new CompileError("unexpected-end", end);
+            return token;
+        };
+        /** Parse an operand: a number, a negation or a parenthesised expression. */
+        const parsePrefix = () => {
+            const token = next();
+            if (token.type == "number")
+                return { type: "number", value: Number(token.text) };
+            if (token.text == "-")
+                return { type: "negate", operand: parseExpression(NEGATE_POWER) };
+            if (token.text != "(")
+                throw new CompileError("unexpected-token", token.position);
+            const inner = parseExpression(0);
+            const closing = peek();
+            if (!closing)
+                throw new CompileError("missing-paren", end);
+            if (closing.text != ")")
+                throw new CompileError("unexpected-token", closing.position);
+            index++;
+            return inner;
+        };
+        /** Parse operators while they bind tighter than minPower. */
+        const parseExpression = (minPower) => {
+            let left = parsePrefix();
+            for (let token = peek(); token && token.text != ")"; token = peek()) {
+                if (token.type != "operator")
+                    throw new CompileError("unexpected-token", token.position);
+                const operator = token.text;
+                const power = BINDING_POWER[operator];
+                if (power <= minPower)
+                    break;
+                index++;
+                // Power is right associative: 2^3^2 is 2^(3^2)
+                const right = parseExpression(operator == "^" ? power - 1 : power);
+                left = { type: "binary", operator, left, right };
+            }
+            return left;
+        };
+        const tree = parseExpression(0);
+        const leftover = peek();
+        if (leftover)
+            throw new CompileError("unexpected-token", leftover.position);
+        return tree;
+    }
+
+    const OPERATIONS = {
+        ADD: (left, right) => left + right,
+        SUB: (left, right) => left - right,
+        MUL: (left, right) => left * right,
+        DIV: (left, right) => left / right,
+        MOD: (left, right) => left % right,
+        POW: (left, right) => Math.pow(left, right),
+    };
+    /** Execute stack instructions and return the single value left on the stack. */
+    function run(instructions) {
+        const stack = [];
+        const pop = () => {
+            const value = stack.pop();
+            if (value === undefined)
+                throw new Error("Stack underflow: the program pops more values than it pushes");
+            return value;
+        };
+        for (const instruction of instructions) {
+            if (instruction.op == "PUSH")
+                stack.push(instruction.value);
+            else if (instruction.op == "NEG")
+                stack.push(-pop());
+            else {
+                const right = pop();
+                stack.push(OPERATIONS[instruction.op](pop(), right));
+            }
+        }
+        if (stack.length != 1)
+            throw new Error(`Program left ${stack.length} values on the stack instead of 1`);
+        return stack[0];
+    }
+
+    /** Curious expressions with the text key that explains each one. */
+    const EXAMPLES = [
+        { source: "0.1 + 0.2", note: "EXAMPLE_FLOAT" },
+        { source: "2 ^ 3 ^ 2", note: "EXAMPLE_POWER" },
+        { source: "-2 ^ 2", note: "EXAMPLE_NEGATE" },
+        { source: "1 / 0", note: "EXAMPLE_INFINITY" },
+        { source: "0 / 0", note: "EXAMPLE_NAN" },
+        { source: "2 ^ 53 + 1", note: "EXAMPLE_SAFE_INTEGER" },
+        { source: "7 % -3", note: "EXAMPLE_MODULO" },
+    ];
+    const ERROR_TEXTS = {
+        "empty": "COMPILER_ERROR_EMPTY",
+        "too-long": "COMPILER_ERROR_TOO_LONG",
+        "unexpected-char": "COMPILER_ERROR_UNEXPECTED_CHAR",
+        "unexpected-token": "COMPILER_ERROR_UNEXPECTED_TOKEN",
+        "unexpected-end": "COMPILER_ERROR_UNEXPECTED_END",
+        "missing-paren": "COMPILER_ERROR_MISSING_PAREN",
+    };
+    /** Interactive compiler: type an expression and see every stage from tokens to result. */
+    function createCompilerExplorer() {
+        const texts = getTexts();
+        const panel = createTextElement("div", "", ["curiosity"]);
+        const output = createTextElement("div", "", ["compiler-output"]);
+        output.setAttribute("aria-live", "polite");
+        const form = document.createElement("form");
+        form.classList.add("number-form");
+        const label = createTextElement("label", texts.COMPILER_INPUT_LABEL, ["number-form-label"]);
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = MAX_SOURCE_LENGTH;
+        input.spellcheck = false;
+        input.autocomplete = "off";
+        input.classList.add("number-form-input", "compiler-input");
+        label.appendChild(input);
+        const button = createTextElement("button", texts.COMPILER_RUN, ["number-form-button"]);
+        button.setAttribute("type", "submit");
+        form.append(label, button);
+        const show = (source) => {
+            input.value = source;
+            output.replaceChildren(...renderStages(source));
+        };
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+            show(input.value);
+        });
+        const examples = createExampleRow(texts.COMPILER_EXAMPLES, EXAMPLES.map(example => example.source), show);
+        panel.append(form, examples, output);
+        show(EXAMPLES[0].source);
+        return panel;
+    }
+    /** Compile a source and render each stage, or the syntax error pointing at its position. */
+    function renderStages(source) {
+        const texts = getTexts();
+        try {
+            const tokens = tokenize(source);
+            const tree = parse(tokens);
+            const program = compile(tree);
+            const result = run(program);
+            const tokenList = createTextElement("div", "", ["compiler-tokens"]);
+            tokens.forEach(token => tokenList.appendChild(createTextElement("span", token.text, ["compiler-token", `is-${token.type}`])));
+            const stages = [
+                createStage(texts.COMPILER_TOKENS, tokenList),
+                createStage(texts.COMPILER_TREE, createTextElement("pre", formatTree(tree).join("\n"), ["compiler-code"])),
+                createStage(texts.COMPILER_BYTECODE, createTextElement("pre", program.map(formatInstruction).join("\n"), ["compiler-code"])),
+                createStage(texts.COMPILER_RESULT, createTextElement("p", String(result), ["compiler-result"])),
+            ];
+            const example = EXAMPLES.find(item => item.source == source.trim());
+            if (example)
+                stages.push(createTextElement("p", `ⓘ ${texts[example.note]}`, ["curiosity-note", "compiler-note"]));
+            return stages;
+        }
+        catch (error) {
+            if (!(error instanceof CompileError))
+                throw error;
+            const message = createTextElement("p", texts[ERROR_TEXTS[error.code]], ["number-form-error"]);
+            message.setAttribute("role", "alert");
+            const pointer = createTextElement("pre", `${source}\n${" ".repeat(error.position)}^`, ["compiler-code", "compiler-pointer"]);
+            return error.code == "empty" || error.code == "too-long" ? [message] : [message, pointer];
+        }
+    }
+    /** Create a titled block for one compiler stage. */
+    function createStage(title, content) {
+        const stage = createTextElement("section", "", ["compiler-stage"]);
+        stage.append(createTextElement("h3", title, ["compiler-stage-title"]), content);
+        return stage;
+    }
+
+    /** Mark every composite up to limit; index i is true when i is prime. */
+    function sieve(limit) {
+        const isPrime = Array.from({ length: limit + 1 }, (_, index) => index >= 2);
+        for (let p = 2; p * p <= limit; p++) {
+            if (!isPrime[p])
+                continue;
+            for (let multiple = p * p; multiple <= limit; multiple += p)
+                isPrime[multiple] = false;
+        }
+        return isPrime;
+    }
+    /** Every prime from 2 to limit, in order. */
+    function primesUpTo(limit) {
+        return sieve(limit).flatMap((isPrime, index) => isPrime ? [index] : []);
+    }
+    /** The steps of the sieve of Eratosthenes; primes above the square root of limit cross nothing, so they have no step. */
+    function sieveSteps(limit) {
+        const isCrossed = new Array(limit + 1).fill(false);
+        const steps = [];
+        for (let p = 2; p * p <= limit; p++) {
+            if (isCrossed[p])
+                continue;
+            const crossed = [];
+            for (let multiple = p * p; multiple <= limit; multiple += p) {
+                if (isCrossed[multiple])
+                    continue;
+                isCrossed[multiple] = true;
+                crossed.push(multiple);
+            }
+            steps.push({ prime: p, crossed });
+        }
+        return steps;
+    }
+    /** Positions of 1..count on the Ulam spiral: right 1, up 1, left 2, down 2, right 3... */
+    function ulamPath(count) {
+        const directions = [{ x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 1 }];
+        const path = [];
+        let point = { x: 0, y: 0 };
+        let turn = 0;
+        let length = 1;
+        while (path.length < count) {
+            for (let step = 0; step < length && path.length < count; step++) {
+                path.push(point);
+                const direction = directions[turn % 4];
+                point = { x: point.x + direction.x, y: point.y + direction.y };
+            }
+            turn++;
+            // The side length grows after every second turn
+            if (turn % 2 == 0)
+                length++;
+        }
+        return path;
+    }
+
+    const LIMIT = 200;
+    const PLAY_INTERVAL_MS = 700;
+    /** Panel that runs the sieve of Eratosthenes over a grid of 1..200, step by step or animated. */
+    function createSieveGrid() {
+        const texts = getTexts();
+        const steps = sieveSteps(LIMIT);
+        const panel = createTextElement("section", "", ["curiosity"]);
+        panel.append(createTextElement("h2", texts.SIEVE_TITLE, ["curiosity-subtitle"]), createTextElement("p", texts.SIEVE_INTRO, ["curiosity-text"]));
+        const grid = createTextElement("div", "", ["sieve-grid"]);
+        grid.setAttribute("role", "img");
+        grid.setAttribute("aria-label", fillText(texts.SIEVE_GRID_LABEL, { limit: String(LIMIT) }));
+        const cells = Array.from({ length: LIMIT }, (_, index) => createTextElement("span", String(index + 1), ["sieve-cell"]));
+        grid.append(...cells);
+        const cellOf = (n) => cells[n - 1];
+        const status = createTextElement("p", texts.SIEVE_START, ["sieve-status"]);
+        status.setAttribute("aria-live", "polite");
+        const next = createButton(texts.SIEVE_NEXT);
+        const play = createButton(texts.SIEVE_PLAY);
+        const reset = createButton(texts.SIEVE_RESET);
+        const actions = createTextElement("div", "", ["curiosity-actions"]);
+        actions.append(next, play, reset);
+        let stepIndex = 0;
+        let timer;
+        const stopPlaying = () => {
+            window.clearInterval(timer);
+            timer = undefined;
+            play.textContent = texts.SIEVE_PLAY;
+        };
+        const advance = () => {
+            // Stop the animation if the user left the page meanwhile
+            if (!panel.isConnected && timer !== undefined)
+                return stopPlaying();
+            if (stepIndex > steps.length)
+                return stopPlaying();
+            if (stepIndex == steps.length) {
+                const primes = primesUpTo(LIMIT);
+                primes.forEach(prime => cellOf(prime).classList.add("is-prime"));
+                status.textContent = fillText(texts.SIEVE_DONE, { count: String(primes.length), limit: String(LIMIT) });
+            }
+            else {
+                const step = steps[stepIndex];
+                cells.forEach(cell => cell.classList.remove("is-current"));
+                cellOf(step.prime).classList.add("is-prime", "is-current");
+                step.crossed.forEach(multiple => cellOf(multiple).classList.add("is-crossed"));
+                status.textContent = fillText(texts.SIEVE_STEP, { prime: String(step.prime), count: String(step.crossed.length) });
+            }
+            stepIndex++;
+            next.toggleAttribute("disabled", stepIndex > steps.length);
+            play.toggleAttribute("disabled", stepIndex > steps.length);
+            if (stepIndex > steps.length)
+                stopPlaying();
+        };
+        next.addEventListener("click", advance);
+        play.addEventListener("click", () => {
+            if (timer !== undefined)
+                return stopPlaying();
+            play.textContent = texts.SIEVE_PAUSE;
+            advance();
+            timer = window.setInterval(advance, PLAY_INTERVAL_MS);
+        });
+        reset.addEventListener("click", () => {
+            stopPlaying();
+            stepIndex = 0;
+            cells.forEach(cell => cell.classList.remove("is-prime", "is-crossed", "is-current"));
+            next.removeAttribute("disabled");
+            play.removeAttribute("disabled");
+            status.textContent = texts.SIEVE_START;
+        });
+        panel.append(actions, grid, status);
+        return panel;
+    }
+    /** Create a plain action button. */
+    function createButton(text) {
+        const button = createTextElement("button", text, ["curiosity-button"]);
+        button.setAttribute("type", "button");
+        return button;
+    }
+
+    /** Create a labelled range input that steps through the given values. */
+    function createSlider(options) {
+        const initialIndex = options.values.indexOf(options.initial);
+        if (initialIndex < 0)
+            throw new Error(`Slider "${options.label}" has no value ${options.initial}`);
+        const wrapper = createTextElement("label", "", ["slider"]);
+        const header = createTextElement("span", "", ["slider-header"]);
+        const output = createTextElement("output", options.format(options.initial), ["slider-value"]);
+        header.append(createTextElement("span", options.label), output);
+        const input = document.createElement("input");
+        input.type = "range";
+        input.min = "0";
+        input.max = String(options.values.length - 1);
+        input.value = String(initialIndex);
+        input.classList.add("slider-input");
+        input.addEventListener("input", () => {
+            const value = options.values[Number(input.value)];
+            output.textContent = options.format(value);
+            input.setAttribute("aria-valuetext", options.format(value));
+            options.onChange(value);
+        });
+        input.setAttribute("aria-valuetext", options.format(options.initial));
+        wrapper.append(header, input);
+        return wrapper;
+    }
+    /** Create a row of toggle buttons where exactly one is pressed. */
+    function createSegmented(label, choices, initial, onSelect) {
+        const group = createTextElement("div", "", ["segmented"]);
+        group.setAttribute("role", "group");
+        group.setAttribute("aria-label", label);
+        const buttons = choices.map(choice => {
+            const button = createTextElement("button", choice.label, ["segmented-option"]);
+            button.setAttribute("type", "button");
+            button.setAttribute("aria-pressed", String(choice.value == initial));
+            button.addEventListener("click", () => {
+                buttons.forEach(other => other.setAttribute("aria-pressed", String(other == button)));
+                onSelect(choice.value);
+            });
+            return button;
+        });
+        group.append(...buttons);
+        return group;
+    }
+
+    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+    const SIDES = [101, 201, 301];
+    /** Panel with the Ulam spiral drawn as one SVG path, so the accent colour follows the theme. */
+    function createUlamSpiral() {
+        const texts = getTexts();
+        const panel = createTextElement("section", "", ["curiosity"]);
+        panel.append(createTextElement("h2", texts.ULAM_TITLE, ["curiosity-subtitle"]), createTextElement("p", texts.ULAM_INTRO, ["curiosity-text"]));
+        const frame = createTextElement("div", "", ["ulam-frame"]);
+        const render = (side) => frame.replaceChildren(drawSpiral(side));
+        const choices = SIDES.map(side => ({ value: side, label: `${side} × ${side}` }));
+        panel.append(createSegmented(texts.ULAM_SIZE, choices, SIDES[0], render), frame);
+        render(SIDES[0]);
+        return panel;
+    }
+    /** Draw a side × side spiral with one unit square per prime. */
+    function drawSpiral(side) {
+        const count = side * side;
+        const path = ulamPath(count);
+        const center = (side - 1) / 2;
+        const primes = primesUpTo(count);
+        const squares = primes.map(prime => {
+            const point = path[prime - 1];
+            return `M${point.x + center} ${point.y + center}h1v1h-1z`;
+        });
+        const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+        svg.setAttribute("viewBox", `0 0 ${side} ${side}`);
+        svg.setAttribute("role", "img");
+        svg.setAttribute("aria-label", fillText(getTexts().ULAM_LABEL, { side: String(side), count: String(primes.length) }));
+        svg.classList.add("ulam-spiral");
+        const shape = document.createElementNS(SVG_NAMESPACE, "path");
+        shape.setAttribute("d", squares.join(""));
+        shape.setAttribute("shape-rendering", "crispEdges");
+        svg.appendChild(shape);
+        return svg;
+    }
+
+    /** The primes curiosity: the sieve first, then the Ulam spiral. */
+    function createPrimesExplorer() {
+        const wrapper = createTextElement("div", "", ["curiosity-stack"]);
+        wrapper.append(createSieveGrid(), createUlamSpiral());
+        return wrapper;
+    }
+
+    /** Sample a stage over whole periods, with ideal diodes; one hidden warm-up period lets the capacitor charge first. */
+    function sampleWave(stage, params, periods, samplesPerPeriod) {
+        const total = (periods + 1) * samplesPerPeriod;
+        const dt = 1 / (params.frequency * samplesPerPeriod);
+        const timeConstant = params.load * params.capacitance * 1e-6;
+        const values = [];
+        let capacitor = 0;
+        for (let i = 0; i < total; i++) {
+            const ac = params.amplitude * Math.sin(2 * Math.PI * params.frequency * i * dt);
+            const full = Math.abs(ac);
+            // The diodes recharge the capacitor while the input is higher; otherwise it discharges through the load
+            capacitor = Math.max(full, capacitor * Math.exp(-dt / timeConstant));
+            values.push(pickStage(stage, ac, full, capacitor));
+        }
+        return values.slice(samplesPerPeriod);
+    }
+    /** The output of the given stage for one instant. */
+    function pickStage(stage, ac, full, capacitor) {
+        switch (stage) {
+            case "ac": return ac;
+            case "half": return Math.max(0, ac);
+            case "full": return full;
+            case "filtered": return capacitor;
+        }
+    }
+    /** Measure the mean, RMS and ripple of a sampled wave. */
+    function measureWave(values) {
+        if (values.length == 0)
+            throw new Error("Cannot measure a wave without samples");
+        const sum = values.reduce((total, value) => total + value, 0);
+        const squares = values.reduce((total, value) => total + value * value, 0);
+        return {
+            average: sum / values.length,
+            rms: Math.sqrt(squares / values.length),
+            ripple: Math.max(...values) - Math.min(...values),
+        };
+    }
+
+    const PERIODS = 3;
+    const SAMPLES_PER_PERIOD = 200;
+    const LOAD_OHMS = 1000;
+    const AMPLITUDES = [1, 2, 5, 9, 12, 15, 20, 24, 30];
+    const FREQUENCIES = [10, 20, 30, 40, 50, 60, 80, 100];
+    const CAPACITANCES = [10, 22, 47, 100, 220, 470, 1000, 2200];
+    /** Name and explanation text keys of each stage. */
+    const STAGES = [
+        { value: "ac", label: "RECT_STAGE_AC", hint: "RECT_HINT_AC" },
+        { value: "half", label: "RECT_STAGE_HALF", hint: "RECT_HINT_HALF" },
+        { value: "full", label: "RECT_STAGE_FULL", hint: "RECT_HINT_FULL" },
+        { value: "filtered", label: "RECT_STAGE_FILTERED", hint: "RECT_HINT_FILTERED" },
+    ];
+    /** Interactive rectifier: pick a stage and tune the circuit to see the wave and its measures. */
+    function createRectifierExplorer() {
+        const texts = getTexts();
+        const panel = createTextElement("div", "", ["curiosity"]);
+        const state = {
+            stage: "ac",
+            params: { amplitude: 12, frequency: 50, capacitance: 470, load: LOAD_OHMS },
+        };
+        const hint = createTextElement("p", "", ["curiosity-text", "rectifier-hint"]);
+        const chart = createTextElement("div", "", ["rectifier-chart"]);
+        const stats = createTextElement("p", "", ["curiosity-stats"]);
+        stats.setAttribute("aria-live", "polite");
+        const render = () => {
+            const stage = STAGES.find(item => item.value == state.stage);
+            hint.textContent = texts[stage.hint];
+            const values = sampleWave(state.stage, state.params, PERIODS, SAMPLES_PER_PERIOD);
+            const limit = state.params.amplitude * 1.1;
+            const label = fillText(texts.RECT_CHART_LABEL, { stage: texts[stage.label] });
+            chart.replaceChildren(createLineChart(values, label, { min: -limit, max: limit, baseline: 0 }));
+            const measure = measureWave(values);
+            stats.replaceChildren(createStat(formatVolts(measure.average), texts.RECT_AVERAGE), createStat(formatVolts(measure.rms), texts.RECT_RMS), createStat(formatVolts(measure.ripple), texts.RECT_RIPPLE));
+        };
+        const update = (change) => {
+            state.params = { ...state.params, ...change };
+            render();
+        };
+        const stageChoices = STAGES.map(stage => ({ value: stage.value, label: texts[stage.label] }));
+        const sliders = createTextElement("div", "", ["rectifier-sliders"]);
+        sliders.append(createSlider({ label: texts.RECT_AMPLITUDE, values: AMPLITUDES, initial: 12, format: value => `${value} V`, onChange: amplitude => update({ amplitude }) }), createSlider({ label: texts.RECT_FREQUENCY, values: FREQUENCIES, initial: 50, format: value => `${value} Hz`, onChange: frequency => update({ frequency }) }), createSlider({ label: texts.RECT_CAPACITANCE, values: CAPACITANCES, initial: 470, format: value => `${value} µF`, onChange: capacitance => update({ capacitance }) }));
+        panel.append(createSegmented(texts.RECT_STAGES, stageChoices, state.stage, stage => { state.stage = stage; render(); }), hint, chart, stats, sliders, createTextElement("p", texts.RECT_NOTE, ["curiosity-note"]));
+        render();
+        return panel;
+    }
+    /** Format volts with two decimals in the current language. */
+    function formatVolts(value) {
+        // Avoid showing "-0,00 V" for averages that are zero up to rounding
+        const rounded = Math.abs(value) < 0.005 ? 0 : value;
+        return `${rounded.toLocaleString(getTexts().LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} V`;
+    }
+
     /** Every curiosity, in the order they are listed inside their category; add new ones here. */
     const CURIOSITIES = [
         {
@@ -2811,10 +3517,36 @@ ${body}</tbody>
             description: "COLLATZ_DESCRIPTION",
             createContent: createCollatzExplorer,
         },
+        {
+            slug: "primes",
+            category: "math",
+            title: "PRIMES_TITLE",
+            summary: "PRIMES_SUMMARY",
+            description: "PRIMES_DESCRIPTION",
+            createContent: createPrimesExplorer,
+        },
+        {
+            slug: "rectifier",
+            category: "physics",
+            title: "RECT_TITLE",
+            summary: "RECT_SUMMARY",
+            description: "RECT_DESCRIPTION",
+            createContent: createRectifierExplorer,
+        },
+        {
+            slug: "compiler",
+            category: "programming",
+            title: "COMPILER_TITLE",
+            summary: "COMPILER_SUMMARY",
+            description: "COMPILER_DESCRIPTION",
+            createContent: createCompilerExplorer,
+        },
     ];
     /** Text key of each category heading. */
     const CATEGORY_TITLES = {
         math: "CATEGORY_MATH",
+        physics: "CATEGORY_PHYSICS",
+        programming: "CATEGORY_PROGRAMMING",
     };
     /** The heading of a category in the current language. */
     function getCategoryTitle(category) {
@@ -2836,19 +3568,22 @@ ${body}</tbody>
         static createCategory(category, curiosities) {
             const section = createTextElement("section", "", ["curiosity-category"]);
             section.appendChild(createSectionHeader(getCategoryTitle(category)));
-            const list = createTextElement("ul", "", ["entry-list"]);
+            const list = createTextElement("ul", "", ["curiosity-list"]);
             curiosities.forEach(curiosity => list.appendChild(CuriositiesView.createItem(curiosity)));
             section.appendChild(list);
             return section;
         }
-        /** Create one row: title linking to the curiosity page, then its one-line summary. */
+        /** Create one card, entirely clickable, with title, summary and a "Try it" call to action. */
         static createItem(curiosity) {
             const texts = getTexts();
-            const item = createTextElement("li", "", ["entry"]);
-            const title = createTextElement("div", "", ["entry-title"]);
-            title.appendChild(createLink(texts[curiosity.title], `#/curiosities/${curiosity.slug}`, ["entry-link"]));
-            item.appendChild(title);
-            item.appendChild(createTextElement("p", texts[curiosity.summary], ["entry-description"]));
+            const item = createTextElement("li", "", ["curiosity-entry"]);
+            const link = createLink("", `#/curiosities/${curiosity.slug}`, ["curiosity-entry-link"]);
+            const body = createTextElement("span", "", ["curiosity-entry-body"]);
+            body.append(createTextElement("strong", texts[curiosity.title], ["curiosity-entry-title"]), createTextElement("span", texts[curiosity.summary], ["curiosity-entry-summary"]));
+            const call = createTextElement("span", texts.CURIOSITY_TRY, ["curiosity-entry-try"]);
+            call.setAttribute("aria-hidden", "true");
+            link.append(body, call);
+            item.appendChild(link);
             return item;
         }
     }

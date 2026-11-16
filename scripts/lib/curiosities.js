@@ -1,5 +1,5 @@
 /** Order in which categories appear on the index. */
-export const CATEGORY_ORDER = ["math"];
+export const CATEGORY_ORDER = ["math", "physics", "programming"];
 /** Group items by category following the given order; categories without items are left out. */
 export function groupByCategory(items, order) {
     return order
