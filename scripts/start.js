@@ -102,14 +102,6 @@
             element.style[key] = styles[key];
         return element;
     }
-    /** Set DOM events*/
-    function setDomEvents(element, events) {
-        if (undefined == element || undefined == events)
-            return element;
-        for (const key in events)
-            element.addEventListener(key, events[key]);
-        return element;
-    }
     /** Set DOM dataset */
     function setDomDataset(element, dataset) {
         if (undefined == element || undefined == dataset)
@@ -200,6 +192,13 @@
         console.debug(`Set route ${path}`);
     }
     /**
+     * Register the route to display when route path is not found.
+     * @param handler The view handler to call
+     */
+    function setNotFoundRoute(handler) {
+        notFoundHandler = handler;
+    }
+    /**
      * Show view for the given route.
      * @param path The given path to search for
      * @param container The container to display the views in
@@ -215,7 +214,7 @@
         const keys = Array.from(paths.keys()).sort(compareRouteLength);
         for (const route of keys) {
             // Check if route matches
-            const regexp = RegExp(route);
+            const regexp = RegExp(`^${route}$`);
             const params = path.match(regexp);
             if (null != params && 0 != params.length) {
                 paths.get(route)(params.slice(1), container);
@@ -238,265 +237,366 @@
         return -1;
     }
 
-    /**
-     * This enum represents the Bubble UI css framework
-     */
-    var BubbleUI;
-    (function (BubbleUI) {
-        BubbleUI["BoxColumn"] = "box-column";
-        BubbleUI["BoxRow"] = "box-row";
-        BubbleUI["boxWrap"] = "box-warp";
-        BubbleUI["BoxCenter"] = "box-center";
-        BubbleUI["BoxXCenter"] = "box-x-center";
-        BubbleUI["BoxYCenter"] = "box-y-center";
-        BubbleUI["BoxXStart"] = "box-x-start";
-        BubbleUI["BoxXEnd"] = "box-x-end";
-        BubbleUI["BoxYStart"] = "box-y-start";
-        BubbleUI["BoxXBetween"] = "box-x-between";
-        BubbleUI["TextCenter"] = "text-center";
-    })(BubbleUI || (BubbleUI = {}));
+    /** Return a copy of the posts sorted from newest to oldest. */
+    function sortPostsByDate(posts) {
+        return [...posts].sort((a, b) => b.date.localeCompare(a.date));
+    }
+    /** Find the post with the given slug. */
+    function findPostBySlug(posts, slug) {
+        return posts.find(post => post.slug == slug);
+    }
+    /** Return up to `limit` featured projects, keeping their original order. */
+    function takeFeatured(projects, limit) {
+        return projects.filter(project => project.featured).slice(0, limit);
+    }
+    /** Format an ISO date (YYYY-MM-DD) as a short human date in the given locale. */
+    function formatPostDate(isoDate, locale) {
+        const [year, month, day] = isoDate.split("-").map(Number);
+        // Build the date in local time so the day never shifts with the timezone
+        const date = new Date(year, month - 1, day);
+        return date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
+    }
 
-    /**
-     * This enum contains the most common HTML tags
-     */
-    var Html;
-    (function (Html) {
-        Html["View"] = "view";
-        Html["Div"] = "div";
-        Html["Span"] = "span";
-        Html["Input"] = "input";
-        Html["Button"] = "button";
-        Html["Textarea"] = "textarea";
-        Html["Select"] = "select";
-        Html["Option"] = "option";
-        Html["Form"] = "form";
-        Html["Label"] = "label";
-        Html["Img"] = "img";
-        Html["A"] = "a";
-        Html["B"] = "b";
-        Html["Table"] = "table";
-        Html["Thead"] = "thead";
-        Html["Tbody"] = "tbody";
-        Html["Tr"] = "tr";
-        Html["Th"] = "th";
-        Html["Td"] = "td";
-        Html["I"] = "i";
-        Html["Ul"] = "ul";
-        Html["Li"] = "li";
-        Html["Nav"] = "nav";
-        Html["Header"] = "header";
-        Html["Footer"] = "footer";
-        Html["Section"] = "section";
-        Html["Article"] = "article";
-        Html["Aside"] = "aside";
-        Html["H1"] = "h1";
-        Html["H2"] = "h2";
-        Html["H3"] = "h3";
-        Html["H4"] = "h4";
-        Html["H5"] = "h5";
-        Html["H6"] = "h6";
-        Html["P"] = "p";
-        Html["Hr"] = "hr";
-        Html["Br"] = "br";
-        Html["Canvas"] = "canvas";
-        Html["Svg"] = "svg";
-        Html["Path"] = "path";
-        Html["Polygon"] = "polygon";
-        Html["Polyline"] = "polyline";
-        Html["Circle"] = "circle";
-        Html["Ellipse"] = "ellipse";
-        Html["Rect"] = "rect";
-        Html["Line"] = "line";
-        Html["Text"] = "text";
-        Html["Tspan"] = "tspan";
-        Html["G"] = "g";
-        Html["Mask"] = "mask";
-        Html["Pattern"] = "pattern";
-        Html["Defs"] = "defs";
-        Html["Symbol"] = "symbol";
-        Html["Use"] = "use";
-        Html["Clippath"] = "clipPath";
-        Html["Stop"] = "stop";
-        Html["LinearGradient"] = "linearGradient";
-        Html["RadialGradient"] = "radialGradient";
-        Html["Filter"] = "filter";
-    })(Html || (Html = {}));
+    /** Loads the site content (profile, projects, posts) from the content folder. */
+    class ContentService {
+        /** Load the site owner's profile. */
+        static async getProfile() {
+            return JSON.parse(await ContentService.fetchText("profile.json"));
+        }
+        /** Load every project, in the order they appear in projects.json. */
+        static async getProjects() {
+            return JSON.parse(await ContentService.fetchText("projects.json"));
+        }
+        /** Load every post entry, newest first. */
+        static async getPosts() {
+            return sortPostsByDate(JSON.parse(await ContentService.fetchText("posts.json")));
+        }
+        /** Load the "about me" markdown. */
+        static async getAbout() {
+            return ContentService.fetchText("about.md");
+        }
+        /** Load the markdown body of a post. */
+        static async getPostBody(post) {
+            return ContentService.fetchText(`posts/${post.slug}.md`);
+        }
+        /** Fetch a content file as text, caching it for the session. */
+        static fetchText(file) {
+            const cached = ContentService.cache.get(file);
+            if (cached)
+                return cached;
+            const request = ContentService.request(file);
+            ContentService.cache.set(file, request);
+            // Forget failed requests so the next navigation can retry
+            request.catch(() => ContentService.cache.delete(file));
+            return request;
+        }
+        /** Request a content file, failing with context on a non-OK response. */
+        static async request(file) {
+            const url = `${getConfiguration("path")["content"]}/${file}`;
+            const response = await fetch(url);
+            if (!response.ok)
+                throw new Error(`Could not load ${url}: HTTP ${response.status}`);
+            return response.text();
+        }
+    }
+    ContentService.cache = new Map();
 
+    function uuidv4() {
+        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16));
+    }
+
+    const buffer = new Map();
     /**
-     * This enum represents the available HTTP methods
-     * @author akrck02
+     * Set a new signal
      */
-    var HttpMethod;
-    (function (HttpMethod) {
-        HttpMethod["Get"] = "GET";
-        HttpMethod["Post"] = "POST";
-        HttpMethod["Put"] = "PUT";
-        HttpMethod["Delete"] = "DELETE";
-        HttpMethod["Update"] = "UPDATE";
-        HttpMethod["Patch"] = "PATCH";
-        HttpMethod["Head"] = "HEAD";
-        HttpMethod["Options"] = "OPTIONS";
-        HttpMethod["Connect"] = "CONNECT";
-        HttpMethod["Trace"] = "TRACE";
-        HttpMethod["All"] = "ALL";
-    })(HttpMethod || (HttpMethod = {}));
-    /**
-     * This enum represents the available mime types
-     * @author akrck02
-     */
-    var MimeType;
-    (function (MimeType) {
-        MimeType["Json"] = "application/json";
-        MimeType["Xml"] = "application/xml";
-        MimeType["Html"] = "text/html";
-        MimeType["Text"] = "text/plain";
-        MimeType["Form"] = "multipart/form-data";
-        MimeType["UrlEncoded"] = "application/x-www-form-urlencoded";
-        MimeType["Blob"] = "application/octet-stream";
-        MimeType["Pdf"] = "application/pdf";
-        MimeType["Zip"] = "application/zip";
-        MimeType["Mp3"] = "audio/mpeg";
-        MimeType["Mp4"] = "video/mp4";
-        MimeType["Png"] = "image/png";
-        MimeType["Jpeg"] = "image/jpeg";
-        MimeType["Gif"] = "image/gif";
-        MimeType["Svg"] = "image/svg+xml";
-        MimeType["Ico"] = "image/x-icon";
-        MimeType["Csv"] = "text/csv";
-        MimeType["Css"] = "text/css";
-        MimeType["Javascript"] = "text/javascript";
-        MimeType["Typescript"] = "text/typescript";
-        MimeType["Webm"] = "video/webm";
-        MimeType["Ogg"] = "video/ogg";
-        MimeType["Ogv"] = "video/ogv";
-        MimeType["Wav"] = "audio/wav";
-        MimeType["Webp"] = "image/webp";
-        MimeType["Woff"] = "font/woff";
-        MimeType["Woff2"] = "font/woff2";
-        MimeType["Ttf"] = "font/ttf";
-        MimeType["Eot"] = "application/vnd.ms-fontobject";
-        MimeType["Otf"] = "font/otf";
-        MimeType["Xls"] = "application/vnd.ms-excel";
-        MimeType["Xlsx"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        MimeType["Doc"] = "application/msword";
-        MimeType["Docx"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        MimeType["Ppt"] = "application/vnd.ms-powerpoint";
-        MimeType["Pptx"] = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-        MimeType["Msg"] = "application/vnd.ms-outlook";
-        MimeType["Rtf"] = "application/rtf";
-        MimeType["Psd"] = "application/photoshop";
-        MimeType["Ai"] = "application/postscript";
-        MimeType["Eps"] = "application/postscript";
-        MimeType["Xps"] = "application/vnd.ms-xpsdocument";
-        MimeType["Swf"] = "application/x-shockwave-flash";
-        MimeType["Flv"] = "video/x-flv";
-        MimeType["Midi"] = "audio/midi";
-        MimeType["Wma"] = "audio/x-ms-wma";
-        MimeType["Wax"] = "audio/x-ms-wax";
-        MimeType["Mka"] = "audio/x-matroska";
-        MimeType["Mkv"] = "video/x-matroska";
-        MimeType["Avi"] = "video/x-msvideo";
-        MimeType["Mov"] = "video/quicktime";
-        MimeType["Wmv"] = "video/x-ms-wmv";
-        MimeType["M4a"] = "audio/mp4";
-        MimeType["M4v"] = "video/mp4";
-        MimeType["F4v"] = "video/mp4";
-        MimeType["F4a"] = "audio/mp4";
-        MimeType["F4b"] = "audio/mp4";
-        MimeType["M4b"] = "audio/mp4";
-        MimeType["M4r"] = "audio/mp4";
-        MimeType["Mpga"] = "audio/mpeg";
-        MimeType["Mp2"] = "audio/mpeg";
-        MimeType["Mp2A"] = "audio/mpeg";
-        MimeType["M2a"] = "audio/mpeg";
-        MimeType["M3a"] = "audio/mpeg";
-        MimeType["Oga"] = "audio/ogg";
-    })(MimeType || (MimeType = {}));
-    /**
-     * This enum represents the available text encodings
-     * @author akrck02
-     */
-    var TextEncoding;
-    (function (TextEncoding) {
-        TextEncoding["Utf8"] = "UTF-8";
-        TextEncoding["Utf16"] = "UTF-16";
-        TextEncoding["Utf16be"] = "UTF-16BE";
-        TextEncoding["Utf16le"] = "UTF-16LE";
-        TextEncoding["Iso88591"] = "ISO-8859-1";
-        TextEncoding["Iso88592"] = "ISO-8859-2";
-        TextEncoding["Iso88593"] = "ISO-8859-3";
-        TextEncoding["Iso88594"] = "ISO-8859-4";
-        TextEncoding["Iso88595"] = "ISO-8859-5";
-        TextEncoding["Iso88596"] = "ISO-8859-6";
-        TextEncoding["Iso88597"] = "ISO-8859-7";
-        TextEncoding["Iso88598"] = "ISO-8859-8";
-        TextEncoding["Iso88599"] = "ISO-8859-9";
-        TextEncoding["Iso885910"] = "ISO-8859-10";
-        TextEncoding["Iso885913"] = "ISO-8859-13";
-        TextEncoding["Iso885914"] = "ISO-8859-14";
-        TextEncoding["Iso885915"] = "ISO-8859-15";
-        TextEncoding["Iso885916"] = "ISO-8859-16";
-        TextEncoding["Koi8R"] = "KOI8-R";
-        TextEncoding["Koi8U"] = "KOI8-U";
-        TextEncoding["Macintosh"] = "macintosh";
-        TextEncoding["Windows1250"] = "windows-1250";
-        TextEncoding["Windows1251"] = "windows-1251";
-        TextEncoding["Windows1252"] = "windows-1252";
-        TextEncoding["Windows1253"] = "windows-1253";
-        TextEncoding["Windows1254"] = "windows-1254";
-        TextEncoding["Windows1255"] = "windows-1255";
-        TextEncoding["Windows1256"] = "windows-1256";
-        TextEncoding["Windows1257"] = "windows-1257";
-        TextEncoding["Windows1258"] = "windows-1258";
-        TextEncoding["Xmaccyrillic"] = "x-mac-cyrillic";
-        TextEncoding["Gb18030"] = "GB18030";
-        TextEncoding["Big5"] = "Big5";
-        TextEncoding["Shiftjis"] = "Shift_JIS";
-        TextEncoding["Eucjp"] = "EUC-JP";
-        TextEncoding["Iso2022jp"] = "ISO-2022-JP";
-        TextEncoding["Euckr"] = "EUC-KR";
-        TextEncoding["Iso2022kr"] = "ISO-2022-KR";
-        TextEncoding["Ibm866"] = "IBM866";
-        TextEncoding["Ibm775"] = "IBM775";
-        TextEncoding["Iso885911"] = "ISO-8859-11";
-        TextEncoding["Windows874"] = "windows-874";
-        TextEncoding["Tis620"] = "TIS-620";
-    })(TextEncoding || (TextEncoding = {}));
-    /**
-     * Make a HTTP GET request.
-     * @param request The request parameters.
-     * @returns The promise of a response.
-     */
-    async function httpGet(request) {
-        request.method = HttpMethod.Get;
-        return httpRequest(request);
+    function setSignal() {
+        const id = uuidv4();
+        buffer.set(id, []);
+        return id;
     }
     /**
-     * Make a HTTP request.
-     * @param request The request parameters.
-     * @returns The promise of a response.
+     * Emit a signal with the given dat
      */
-    function httpRequest(request) {
-        let options = {
-            method: request.method || HttpMethod.Get,
-            headers: {
-                "Content-type": `${request.contentType || "application/json"};charset=${request.charset || "UTF-8"}`,
-                "mode": "cors",
-                "Sec-Fetch-Site": "cross-site",
-            },
-        };
-        request.headers && Object.assign(options.headers, request.headers);
-        if (HttpMethod.Get !== request.method) {
-            if (request.parameters instanceof FormData) {
-                options["body"] = request.parameters;
-                options.headers["Content-type"] = `multipart/form-data;charset=${request.charset || "UTF-8"}`;
+    async function emitSignal(id, data) {
+        if (false == buffer.has(id))
+            return;
+        const targets = buffer.get(id);
+        for (const target of targets) {
+            target(data);
+        }
+    }
+
+    const THEME_CHANGED_SIGNAL = setSignal();
+    const THEME_STORAGE_KEY = "softwareanvil-theme";
+    /** Applies the colour theme and remembers the visitor's choice. */
+    class Theme {
+        /** Apply the saved theme, or the system preference when nothing is saved. */
+        static init() {
+            Theme.apply(Theme.readStored() ?? Theme.readSystem());
+        }
+        /** Switch between light and dark and remember the choice. */
+        static toggle() {
+            const next = Theme.isDark() ? "light" : "dark";
+            Theme.apply(next);
+            Theme.store(next);
+            emitSignal(THEME_CHANGED_SIGNAL, { theme: next });
+        }
+        /** Whether the dark theme is active. */
+        static isDark() {
+            return document.documentElement.dataset["theme"] == "dark";
+        }
+        /** Set the theme on the root element. */
+        static apply(theme) {
+            setDomDataset(document.documentElement, { theme });
+        }
+        /** Read the theme preferred by the operating system. */
+        static readSystem() {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        /** Read the saved theme, if storage is available and holds a valid value. */
+        static readStored() {
+            try {
+                const stored = localStorage.getItem(THEME_STORAGE_KEY);
+                return stored == "light" || stored == "dark" ? stored : undefined;
             }
-            else {
-                options["body"] = JSON.stringify(request.parameters);
+            catch {
+                // Storage blocked (private mode): fall back to the system theme
+                return undefined;
             }
         }
-        return fetch(request.url, options);
+        /** Save the theme, ignoring storage that is blocked. */
+        static store(theme) {
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, theme);
+            }
+            catch {
+                // Storage blocked (private mode): the choice lasts only for this visit
+            }
+        }
     }
+
+    /** Create an element whose text is set as plain text, never parsed as HTML. */
+    function createTextElement(type, text, classes = []) {
+        const element = document.createElement(type);
+        element.textContent = text;
+        setDomClasses(element, classes);
+        return element;
+    }
+    /** Create a link; external links open in a new tab. */
+    function createLink(text, href, classes = []) {
+        const link = document.createElement("a");
+        link.textContent = text;
+        link.href = href;
+        setDomClasses(link, classes);
+        if (href.startsWith("http"))
+            setDomAttributes(link, { target: "_blank", rel: "noopener noreferrer" });
+        return link;
+    }
+    /** Create the root element of a page view. */
+    function createPage(id) {
+        const page = document.createElement("section");
+        page.id = id;
+        setDomClasses(page, ["page"]);
+        return page;
+    }
+    /** Set the browser tab title, suffixed with the site name. */
+    function setPageTitle(title) {
+        const siteName = getConfiguration("base")["app_name"];
+        document.title = title ? `${title} · ${siteName}` : siteName;
+    }
+    /** Create a page heading with an optional intro line. */
+    function createPageHeader(title, intro) {
+        const header = createTextElement("header", "", ["page-header"]);
+        header.appendChild(createTextElement("h1", title));
+        if (intro)
+            header.appendChild(createTextElement("p", intro, ["page-intro"]));
+        return header;
+    }
+    /** Create a section heading with an optional "see all" link on the right. */
+    function createSectionHeader(title, link) {
+        const header = createTextElement("div", "", ["section-header"]);
+        header.appendChild(createTextElement("h2", title));
+        if (link)
+            header.appendChild(createLink(link.text, link.href, ["section-link"]));
+        return header;
+    }
+    /** Create a muted message for empty lists. */
+    function createEmptyState(text) {
+        return createTextElement("p", text, ["state", "state-empty"]);
+    }
+    /** Create a visible error message for content that failed to load. */
+    function createErrorState(text, error) {
+        console.error(error);
+        const element = createTextElement("p", text, ["state", "state-error"]);
+        element.setAttribute("role", "alert");
+        return element;
+    }
+
+    /** User-facing interface texts, kept in one place. */
+    const TEXTS = {
+        LOCALE: "es-ES",
+        NAV_HOME: "Inicio",
+        NAV_PROJECTS: "Proyectos",
+        NAV_BLOG: "Blog",
+        TOGGLE_THEME: "Cambiar tema",
+        ABOUT_TITLE: "Sobre mí",
+        PROJECTS_TITLE: "Proyectos",
+        PROJECTS_INTRO: "Cosas que he construido o en las que estoy trabajando.",
+        BLOG_TITLE: "Blog",
+        BLOG_INTRO: "Notas sobre lo que construyo y aprendo.",
+        LATEST_POSTS_TITLE: "Últimos posts",
+        SEE_ALL: "Ver todos →",
+        BACK_TO_BLOG: "← Volver al blog",
+        NO_PROJECTS: "Todavía no hay proyectos.",
+        NO_POSTS: "Todavía no hay posts.",
+        LOAD_ERROR: "No se ha podido cargar el contenido. Prueba a recargar la página.",
+        NOT_FOUND_TITLE: "404",
+        NOT_FOUND_TEXT: "Esta página no existe.",
+        NOT_FOUND_LINK: "← Volver al inicio",
+    };
+
+    /** Create the list of projects, or an empty state when there are none. */
+    function createProjectList(projects) {
+        if (projects.length == 0)
+            return createEmptyState(TEXTS.NO_PROJECTS);
+        const list = createTextElement("ul", "", ["entry-list"]);
+        projects.forEach(project => list.appendChild(createProjectItem(project)));
+        return list;
+    }
+    /** Create the list of posts, or an empty state when there are none. */
+    function createPostList(posts) {
+        if (posts.length == 0)
+            return createEmptyState(TEXTS.NO_POSTS);
+        const list = createTextElement("ul", "", ["entry-list"]);
+        posts.forEach(post => list.appendChild(createPostItem(post)));
+        return list;
+    }
+    /** Create one project row: name and year, description, tags. */
+    function createProjectItem(project) {
+        const item = createTextElement("li", "", ["entry"]);
+        const title = createTextElement("div", "", ["entry-title"]);
+        title.appendChild(createLink(project.name, project.url, ["entry-link"]));
+        title.appendChild(createTextElement("span", String(project.year), ["entry-meta"]));
+        item.appendChild(title);
+        item.appendChild(createTextElement("p", project.description, ["entry-description"]));
+        const tags = createTextElement("div", "", ["entry-tags"]);
+        project.tags.forEach(tag => tags.appendChild(createTextElement("span", tag, ["tag"])));
+        item.appendChild(tags);
+        return item;
+    }
+    /** Create one post row: title and date, summary. */
+    function createPostItem(post) {
+        const item = createTextElement("li", "", ["entry"]);
+        const title = createTextElement("div", "", ["entry-title"]);
+        title.appendChild(createLink(post.title, `#/blog/${post.slug}`, ["entry-link"]));
+        const date = createTextElement("time", formatPostDate(post.date, TEXTS.LOCALE), ["entry-meta"]);
+        date.setAttribute("datetime", post.date);
+        title.appendChild(date);
+        item.appendChild(title);
+        item.appendChild(createTextElement("p", post.summary, ["entry-description"]));
+        return item;
+    }
+
+    /** Page listing every post, newest first. */
+    class BlogView {
+        /** Show the blog view. */
+        static async show(_parameters, container) {
+            setPageTitle(TEXTS.BLOG_TITLE);
+            const page = createPage(BlogView.VIEW_ID);
+            page.appendChild(createPageHeader(TEXTS.BLOG_TITLE, TEXTS.BLOG_INTRO));
+            container.appendChild(page);
+            try {
+                page.appendChild(createPostList(await ContentService.getPosts()));
+            }
+            catch (error) {
+                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+            }
+        }
+    }
+    BlogView.VIEW_ID = "blog";
+
+    /** Site footer with the copyright line and the social links, which act as contact. */
+    class Footer {
+        /** Create the footer with the copyright line; socials are added once the profile loads. */
+        static create(siteName) {
+            const footer = createTextElement("footer", "", ["footer"]);
+            const inner = createTextElement("div", "", ["footer-inner"]);
+            inner.appendChild(createTextElement("p", `© ${new Date().getFullYear()} ${siteName}`, ["footer-copy"]));
+            inner.appendChild(createTextElement("div", "", ["footer-socials"]));
+            footer.appendChild(inner);
+            return footer;
+        }
+        /** Fill the footer with one icon link per social. */
+        static setSocials(footer, socials) {
+            const container = footer.querySelector(".footer-socials");
+            if (!container)
+                return;
+            container.replaceChildren(...socials.map(Footer.createSocialLink));
+        }
+        /** Create a social link with its icon, or its label when there is no icon for it. */
+        static createSocialLink(social) {
+            const icon = getIcon("social", social.id, "22px", "currentColor") ?? getIcon("material", social.id, "22px", "currentColor");
+            const link = createLink(icon ? "" : social.label, social.url, ["footer-social"]);
+            link.setAttribute("aria-label", social.label);
+            link.title = social.label;
+            if (icon)
+                link.appendChild(icon);
+            return link;
+        }
+    }
+
+    /** Top navigation bar with the site name, section links and theme toggle. */
+    class Navbar {
+        /** Create the navigation bar. */
+        static create(siteName) {
+            const header = createTextElement("header", "", ["navbar"]);
+            const inner = createTextElement("div", "", ["navbar-inner"]);
+            inner.appendChild(createLink(siteName, "#/", ["navbar-brand"]));
+            const nav = createTextElement("nav", "", ["navbar-links"]);
+            nav.setAttribute("aria-label", "Main");
+            Navbar.LINKS.forEach(link => {
+                const anchor = createLink(link.text, `#/${link.section}`, ["navbar-link"]);
+                anchor.dataset["section"] = link.section;
+                nav.appendChild(anchor);
+            });
+            nav.appendChild(Navbar.createThemeToggle());
+            inner.appendChild(nav);
+            header.appendChild(inner);
+            return header;
+        }
+        /** Mark the link of the section that contains the given path as current. */
+        static highlight(navbar, path) {
+            const section = path.split("/")[0];
+            navbar.querySelectorAll(".navbar-link").forEach(link => {
+                if (link.dataset["section"] == section)
+                    link.setAttribute("aria-current", "page");
+                else
+                    link.removeAttribute("aria-current");
+            });
+        }
+        /** Create the button that switches between light and dark themes. */
+        static createThemeToggle() {
+            const button = createTextElement("button", "", ["theme-toggle"]);
+            button.setAttribute("aria-label", TEXTS.TOGGLE_THEME);
+            button.title = TEXTS.TOGGLE_THEME;
+            Navbar.renderThemeIcon(button);
+            button.addEventListener("click", () => {
+                Theme.toggle();
+                Navbar.renderThemeIcon(button);
+            });
+            return button;
+        }
+        /** Show the icon of the theme the button will switch to. */
+        static renderThemeIcon(button) {
+            const icon = getIcon("material", Theme.isDark() ? "light_mode" : "dark_mode", "20px", "currentColor");
+            button.replaceChildren(icon);
+        }
+    }
+    Navbar.LINKS = [
+        { text: TEXTS.NAV_HOME, section: "" },
+        { text: TEXTS.NAV_PROJECTS, section: "projects" },
+        { text: TEXTS.NAV_BLOG, section: "blog" },
+    ];
 
     /*
      * @license
@@ -1767,175 +1867,169 @@ ${body}</tbody>
         }
     }
 
-    function uuidv4() {
-        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16));
-    }
-
-    const buffer = new Map();
-    /**
-     * Set a new signal
-     */
-    function setSignal() {
-        const id = uuidv4();
-        buffer.set(id, []);
-        return id;
-    }
-    /**
-     * Emit a signal with the given dat
-     */
-    async function emitSignal(id, data) {
-        if (false == buffer.has(id))
-            return;
-        const targets = buffer.get(id);
-        for (const target of targets) {
-            target(data);
-        }
-    }
-
-    const THEME_CHANGED_SIGNAL = setSignal();
-    class Theme {
-        static toggle() {
-            if (document.documentElement.dataset.theme == "dark") {
-                setDomDataset(document.documentElement, { theme: "light" });
-            }
-            else {
-                setDomDataset(document.documentElement, { theme: "dark" });
-            }
-            emitSignal(THEME_CHANGED_SIGNAL, {});
-        }
-        static isDark() {
-            return document.documentElement.dataset["theme"] == "dark";
-        }
-    }
-
+    /** Landing page: greeting, about me, featured projects and latest posts. */
     class HomeView {
-        /**
-         * Show home view
-         */
-        static async show(parameters, container) {
-            const view = uiComponent({
-                type: Html.View,
-                id: HomeView.VIEW_ID,
-                classes: [BubbleUI.BoxColumn, BubbleUI.BoxCenter],
-            });
-            const topBar = HomeView.topBar();
-            view.appendChild(topBar);
-            // const title = uiComponent({
-            //   type: Html.H1,
-            //   text: getConfiguration("base")["app_name"],
-            //   styles: {
-            //     fontSize: "5rem",
-            //     marginBottom: "3rem",
-            //   },
-            //   selectable: false,
-            // });
-            // Este hace toggle del tema
-            const description = uiComponent({
-                type: Html.P,
-                text: "my personal website.",
-                selectable: false,
-            });
-            const button = uiComponent({
-                type: Html.Button,
-                text: "Clicker",
-            });
-            const gitButton = uiComponent({
-                type: Html.Button,
-                text: "",
-            });
-            const githubIcon = getIcon("social", "github", "24px", "var(--on-surface-1)");
-            gitButton.appendChild(githubIcon);
-            setDomEvents(button, {
-                click: (e) => {
-                    Theme.toggle();
-                },
-            });
-            setDomEvents(gitButton, {
-                click: (e) => {
-                    window.open("https://github.com/Itros97", "_blank");
-                },
-            });
-            const a = await HomeView.getDocumentHTML();
-            const doc = uiComponent({
-                classes: ["markdown"],
-                text: MarkdownService.render(a),
-            });
-            //view.appendChild(title);
-            view.appendChild(description);
-            view.appendChild(button);
-            view.appendChild(gitButton);
-            view.appendChild(doc);
-            container.appendChild(view);
+        /** Show the home view. */
+        static async show(_parameters, container) {
+            setPageTitle();
+            const page = createPage(HomeView.VIEW_ID);
+            container.appendChild(page);
+            try {
+                const [profile, about, projects, posts] = await Promise.all([
+                    ContentService.getProfile(),
+                    ContentService.getAbout(),
+                    ContentService.getProjects(),
+                    ContentService.getPosts(),
+                ]);
+                page.appendChild(HomeView.createHero(profile.headline, profile.tagline));
+                page.appendChild(HomeView.createAbout(about));
+                page.appendChild(HomeView.createSection(TEXTS.PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))));
+                page.appendChild(HomeView.createSection(TEXTS.LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))));
+            }
+            catch (error) {
+                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+            }
         }
-        static async getDocumentHTML() {
-            const response = await httpGet({
-                url: `${getConfiguration("path")["markdowns"]}/doc.MD`,
-                parameters: {},
-            });
-            return await response.text();
+        /** Create the big greeting at the top of the page. */
+        static createHero(headline, tagline) {
+            const hero = createTextElement("header", "", ["hero"]);
+            hero.appendChild(createTextElement("h1", headline, ["hero-title"]));
+            hero.appendChild(createTextElement("p", tagline, ["hero-tagline"]));
+            return hero;
         }
-        static topBar() {
-            const topBar = uiComponent({
-                type: Html.Div,
-                classes: [BubbleUI.BoxRow, BubbleUI.BoxXBetween],
-                styles: {
-                    padding: ".5rem 1rem ",
-                    width: "100%",
-                    background: "var(--surface-1)",
-                    marginBottom: "2rem",
-                },
-            });
-            const navTitle = uiComponent({
-                type: Html.P,
-                text: getConfiguration("base")["app_name"],
-            });
-            topBar.appendChild(navTitle);
-            const iconBar = uiComponent({
-                type: Html.Div,
-                classes: [BubbleUI.BoxRow, BubbleUI.BoxXEnd],
-            });
-            topBar.appendChild(iconBar);
-            const themeIconButton = uiComponent({
-                styles: { cursor: "pointer" },
-            });
-            const themeIcon = getIcon("material", Theme.isDark() ? "light_theme" : "dark_mode", "24px", "var(--on-surface-1)");
-            themeIcon.id = "theme-icon";
-            themeIconButton.appendChild(themeIcon);
-            iconBar.appendChild(themeIconButton);
-            setDomEvents(themeIcon, {
-                click: (e) => Theme.toggle(),
-            });
-            return topBar;
+        /** Create the "about me" section from its markdown. */
+        static createAbout(markdown) {
+            const section = createTextElement("section", "", ["home-section"]);
+            section.appendChild(createSectionHeader(TEXTS.ABOUT_TITLE));
+            const body = createTextElement("div", "", ["markdown"]);
+            body.innerHTML = MarkdownService.render(markdown);
+            section.appendChild(body);
+            return section;
+        }
+        /** Create a preview section with a "see all" link. */
+        static createSection(title, href, content) {
+            const section = createTextElement("section", "", ["home-section"]);
+            section.appendChild(createSectionHeader(title, { text: TEXTS.SEE_ALL, href }));
+            section.appendChild(content);
+            return section;
         }
     }
-    // HTML ids and classes
     HomeView.VIEW_ID = "home";
+    HomeView.PREVIEW_LIMIT = 3;
 
-    /**
-     * When the dynamic URL changes loads
-     * the correspoding view from the URL
-     */
-    window.addEventListener("hashchange", start);
-    /**
-     * When the window is loaded load
-     * the app state to show
-     */
+    /** Page shown when no route matches. */
+    class NotFoundView {
+        /** Show the not found view. */
+        static async show(_parameters, container) {
+            setPageTitle(TEXTS.NOT_FOUND_TITLE);
+            const page = createPage(NotFoundView.VIEW_ID);
+            page.appendChild(createPageHeader(TEXTS.NOT_FOUND_TITLE, TEXTS.NOT_FOUND_TEXT));
+            page.appendChild(createLink(TEXTS.NOT_FOUND_LINK, "#/", ["back-link"]));
+            container.appendChild(page);
+        }
+    }
+    NotFoundView.VIEW_ID = "not-found";
+
+    /** Page showing a single post. Expects the post slug as the first route parameter. */
+    class PostView {
+        /** Show the post view, or the not found view when the slug is unknown. */
+        static async show(parameters, container) {
+            const page = createPage(PostView.VIEW_ID);
+            container.appendChild(page);
+            try {
+                const post = findPostBySlug(await ContentService.getPosts(), parameters[0] ?? "");
+                if (!post) {
+                    page.remove();
+                    await NotFoundView.show([], container);
+                    return;
+                }
+                setPageTitle(post.title);
+                const body = await ContentService.getPostBody(post);
+                page.appendChild(createLink(TEXTS.BACK_TO_BLOG, "#/blog", ["back-link"]));
+                page.appendChild(PostView.createHeader(post.title, post.date));
+                const article = createTextElement("article", "", ["markdown"]);
+                article.innerHTML = MarkdownService.render(body);
+                page.appendChild(article);
+            }
+            catch (error) {
+                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+            }
+        }
+        /** Create the post title and date. */
+        static createHeader(title, isoDate) {
+            const header = createTextElement("header", "", ["page-header"]);
+            header.appendChild(createTextElement("h1", title));
+            const date = createTextElement("time", formatPostDate(isoDate, TEXTS.LOCALE), ["page-intro"]);
+            date.setAttribute("datetime", isoDate);
+            header.appendChild(date);
+            return header;
+        }
+    }
+    PostView.VIEW_ID = "post";
+
+    /** Page listing every project. */
+    class ProjectsView {
+        /** Show the projects view. */
+        static async show(_parameters, container) {
+            setPageTitle(TEXTS.PROJECTS_TITLE);
+            const page = createPage(ProjectsView.VIEW_ID);
+            page.appendChild(createPageHeader(TEXTS.PROJECTS_TITLE, TEXTS.PROJECTS_INTRO));
+            container.appendChild(page);
+            try {
+                page.appendChild(createProjectList(await ContentService.getProjects()));
+            }
+            catch (error) {
+                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+            }
+        }
+    }
+    ProjectsView.VIEW_ID = "projects";
+
+    let layout;
+    window.addEventListener("hashchange", renderCurrentRoute);
+    window.onresize = () => Display.checkType();
     window.onload = async function () {
         await loadConfiguration("gtdf.config.json");
-        document.title = getConfiguration("base")["app_name"];
+        Theme.init();
         Display.checkType();
-        await loadIcons("material", `${getConfiguration("path")["icons"]}/materialicons.json`);
-        await loadIcons("social", `${getConfiguration("path")["icons"]}/socialicons.json`);
-        await start();
+        const iconsPath = getConfiguration("path")["icons"];
+        await Promise.all([
+            loadIcons("material", `${iconsPath}/materialicons.json`),
+            loadIcons("social", `${iconsPath}/socialicons.json`),
+        ]);
+        registerRoutes();
+        layout = mountLayout(getConfiguration("base")["app_name"]);
+        renderCurrentRoute();
     };
-    window.onresize = async function () {
-        Display.checkType();
-    };
-    /** Start the web app     */
-    async function start() {
+    /** Register every view with its route. */
+    function registerRoutes() {
         setRoute("", HomeView.show);
-        //bsetNotFoundRoute();
-        showRoute(window.location.hash.slice(1).toLowerCase(), document.body);
+        setRoute("projects", ProjectsView.show);
+        setRoute("blog", BlogView.show);
+        setRoute("blog/$", PostView.show);
+        setNotFoundRoute(NotFoundView.show);
+    }
+    /** Build the page shell once; the footer socials fill in when the profile loads. */
+    function mountLayout(siteName) {
+        const navbar = Navbar.create(siteName);
+        const main = document.createElement("main");
+        main.classList.add("content");
+        const footer = Footer.create(siteName);
+        document.body.replaceChildren(navbar, main, footer);
+        // Without a profile the footer keeps just the copyright line; views show their own error
+        ContentService.getProfile()
+            .then(profile => Footer.setSocials(footer, profile.socials))
+            .catch(error => console.error(error));
+        return { navbar, main };
+    }
+    /** Show the view for the current URL hash, e.g. "#/blog/my-post" -> "blog/my-post". */
+    function renderCurrentRoute() {
+        if (!layout)
+            return;
+        const path = window.location.hash.replace(/^#\/?/, "").replace(/\/$/, "").toLowerCase();
+        Navbar.highlight(layout.navbar, path);
+        showRoute(path, layout.main);
+        window.scrollTo(0, 0);
     }
 
 })();

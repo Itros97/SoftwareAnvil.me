@@ -50,7 +50,7 @@ export function showRoute(path, container) {
     const keys = Array.from(paths.keys()).sort(compareRouteLength);
     for (const route of keys) {
         // Check if route matches
-        const regexp = RegExp(route);
+        const regexp = RegExp(`^${route}$`);
         const params = path.match(regexp);
         if (null != params && 0 != params.length) {
             paths.get(route)(params.slice(1), container);
