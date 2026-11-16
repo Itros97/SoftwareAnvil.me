@@ -31,6 +31,18 @@ export interface Profile {
 	socials: Social[]
 }
 
+/** One row of the setup section, such as "CPU" → "AMD Ryzen 7 7700X". */
+export interface SetupItem {
+	label: string
+	value: string
+}
+
+/** A titled group of setup rows, such as "Hardware" or "Monitors". */
+export interface SetupGroup {
+	title: string
+	items: SetupItem[]
+}
+
 /** Return a copy of the posts sorted from newest to oldest. */
 export function sortPostsByDate(posts: Post[]): Post[] {
 	return [...posts].sort((a, b) => b.date.localeCompare(a.date))
@@ -53,4 +65,9 @@ export function formatPostDate(isoDate: string, locale: string): string {
 	// Build the date in local time so the day never shifts with the timezone
 	const date = new Date(year, month - 1, day)
 	return date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })
+}
+
+/** Return the setup groups that have at least one item, keeping their order. */
+export function filterNonEmptyGroups(groups: SetupGroup[]): SetupGroup[] {
+	return groups.filter(group => group.items.length > 0)
 }
