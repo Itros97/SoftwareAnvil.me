@@ -534,6 +534,18 @@
         NOT_FOUND_TITLE: "404",
         NOT_FOUND_TEXT: "Esta página no existe.",
         NOT_FOUND_LINK: "← Volver al inicio",
+        GAME_OPEN: "Abrir minijuego",
+        GAME_TITLE: "forge — terminal",
+        GAME_HELP: "Escribe cada comando tal cual. Tienes 30 segundos y el tiempo empieza con la primera tecla.",
+        GAME_INPUT_LABEL: "Escribe el comando",
+        GAME_CLOSE: "Cerrar",
+        GAME_SCORE: "puntos",
+        GAME_WPM: "ppm",
+        GAME_BEST: "récord",
+        GAME_NEXT: "siguiente",
+        GAME_OVER: "¡Tiempo!",
+        GAME_NEW_BEST: "¡Nuevo récord!",
+        GAME_RESTART: "Pulsa Enter para jugar otra vez · Esc para salir",
     };
     const EN = {
         LOCALE: "en-US",
@@ -557,6 +569,18 @@
         NOT_FOUND_TITLE: "404",
         NOT_FOUND_TEXT: "This page does not exist.",
         NOT_FOUND_LINK: "← Back to home",
+        GAME_OPEN: "Open minigame",
+        GAME_TITLE: "forge — terminal",
+        GAME_HELP: "Type each command exactly. You have 30 seconds, and the clock starts with your first keystroke.",
+        GAME_INPUT_LABEL: "Type the command",
+        GAME_CLOSE: "Close",
+        GAME_SCORE: "score",
+        GAME_WPM: "wpm",
+        GAME_BEST: "best",
+        GAME_NEXT: "next",
+        GAME_OVER: "Time's up!",
+        GAME_NEW_BEST: "New best score!",
+        GAME_RESTART: "Press Enter to play again · Esc to quit",
     };
     const TEXTS_BY_LANGUAGE = { es: ES, en: EN };
     /** The interface texts in the current language. */
@@ -654,6 +678,279 @@
         }
     }
 
+    /** Shell commands the player has to type. */
+    const COMMANDS = [
+        "git push",
+        "git status",
+        "git commit -m \"fix\"",
+        "git pull --rebase",
+        "npm run build",
+        "npm test",
+        "npm install",
+        "ls -la",
+        "cd ~/forge",
+        "mkdir anvil",
+        "cat README.md",
+        "grep -r TODO src",
+        "tsc --watch",
+        "docker compose up",
+        "ssh forge@anvil",
+        "chmod +x bin/lit",
+        "echo \"hello\"",
+        "rm -rf node_modules",
+    ];
+    /** Compare the typed text with the target command. */
+    function compareInput(target, typed) {
+        let correct = 0;
+        while (correct < typed.length && typed[correct] == target[correct])
+            correct++;
+        const hasError = correct < typed.length;
+        return { correct, hasError, complete: !hasError && typed.length == target.length };
+    }
+    /** Words per minute, counting five characters as one word. */
+    function calculateWpm(correctChars, elapsedMs) {
+        if (elapsedMs <= 0)
+            return 0;
+        return Math.round((correctChars / 5) / (elapsedMs / 60_000));
+    }
+    /** Pick a random command different from the previous one, when there is more than one. */
+    function pickNextCommand(commands, previous, random) {
+        if (commands.length == 0)
+            throw new Error("pickNextCommand needs at least one command");
+        const candidates = commands.length > 1 ? commands.filter(command => command != previous) : commands;
+        return candidates[Math.floor(random() * candidates.length)];
+    }
+
+    const BEST_STORAGE_KEY = "softwareanvil-typing-best";
+    /** Remembers the visitor's best score in the typing game. */
+    class GameScoreService {
+        /** Read the best score, or 0 when storage is blocked or empty. */
+        static readBest() {
+            try {
+                return Number(localStorage.getItem(BEST_STORAGE_KEY)) || 0;
+            }
+            catch {
+                // Storage blocked (private mode): the best score lasts only for this visit
+                return 0;
+            }
+        }
+        /** Save the best score, ignoring storage that is blocked. */
+        static storeBest(score) {
+            try {
+                localStorage.setItem(BEST_STORAGE_KEY, String(score));
+            }
+            catch {
+                // Storage blocked (private mode): the best score lasts only for this visit
+            }
+        }
+    }
+
+    /** Build the terminal-styled game dialog. */
+    function buildGameDialog(texts) {
+        const dialog = document.createElement("dialog");
+        dialog.classList.add("game");
+        dialog.setAttribute("aria-label", texts.GAME_TITLE);
+        const titlebar = createTextElement("div", "", ["game-titlebar"]);
+        titlebar.appendChild(createTextElement("span", texts.GAME_TITLE, ["game-title"]));
+        const close = createTextElement("button", "✕", ["game-close"]);
+        close.setAttribute("aria-label", texts.GAME_CLOSE);
+        titlebar.appendChild(close);
+        const body = createTextElement("div", "", ["game-body"]);
+        body.appendChild(createTextElement("p", texts.GAME_HELP, ["game-help"]));
+        const line = createTextElement("div", "", ["game-line"]);
+        line.appendChild(createTextElement("span", "~/forge $", ["game-prompt"]));
+        const target = createTextElement("span", "", ["game-target"]);
+        target.setAttribute("aria-live", "polite");
+        line.appendChild(target);
+        body.appendChild(line);
+        const input = document.createElement("input");
+        input.classList.add("game-input");
+        input.setAttribute("aria-label", texts.GAME_INPUT_LABEL);
+        for (const [name, value] of Object.entries({ autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false" })) {
+            input.setAttribute(name, value);
+        }
+        body.appendChild(input);
+        const timebar = createTextElement("div", "", ["game-timebar"]);
+        const timeFill = createTextElement("div", "", ["game-timebar-fill"]);
+        timebar.appendChild(timeFill);
+        body.appendChild(timebar);
+        const stats = createTextElement("p", "", ["game-stats"]);
+        const next = createTextElement("p", "", ["game-next"]);
+        const result = createTextElement("div", "", ["game-result"]);
+        result.setAttribute("role", "status");
+        body.append(stats, next, result);
+        const frame = createTextElement("div", "", ["game-window"]);
+        frame.append(titlebar, body);
+        dialog.appendChild(frame);
+        return { dialog, input, close, target, timeFill, stats, next, result };
+    }
+    /** Paint the target command: typed-correct, typed-wrong, pending, and the cursor position. */
+    function renderTarget(element, target, typed) {
+        const { correct } = compareInput(target, typed);
+        const wrongEnd = Math.min(typed.length, target.length);
+        const parts = [
+            createTextElement("span", target.slice(0, correct), ["game-char-ok"]),
+            createTextElement("span", target.slice(correct, wrongEnd), ["game-char-error"]),
+            createTextElement("span", target.slice(wrongEnd), ["game-char-pending"]),
+        ];
+        // The cursor sits before the first pending character
+        parts[2].classList.add("game-cursor");
+        element.replaceChildren(...parts);
+    }
+    /** Update the score, words per minute, best score and next command. */
+    function renderStats(elements, stats, texts) {
+        elements.stats.textContent = `${texts.GAME_SCORE} ${stats.score} · ${texts.GAME_WPM} ${stats.wpm} · ${texts.GAME_BEST} ${stats.best}`;
+        elements.next.textContent = `${texts.GAME_NEXT}: ${stats.next}`;
+    }
+    /** Set how much of the time bar is left, from 1 (full) to 0 (empty). */
+    function renderTime(elements, remaining) {
+        elements.timeFill.style.transform = `scaleX(${Math.max(0, remaining)})`;
+    }
+    /** Show the end-of-run summary, or hide it when `summary` is undefined. */
+    function renderResult(elements, texts, summary) {
+        if (!summary) {
+            elements.result.replaceChildren();
+            return;
+        }
+        const title = summary.isNewBest ? texts.GAME_NEW_BEST : texts.GAME_OVER;
+        elements.result.replaceChildren(createTextElement("p", title, ["game-result-title"]), createTextElement("p", `${texts.GAME_SCORE} ${summary.score} · ${texts.GAME_WPM} ${summary.wpm}`), createTextElement("p", texts.GAME_RESTART, ["game-result-hint"]));
+    }
+
+    const RUN_DURATION_MS = 30_000;
+    const TICK_MS = 100;
+    // Below this, WPM swings wildly (a few characters over a few milliseconds), so it shows 0
+    const MIN_WPM_ELAPSED_MS = 3_000;
+    /** Hidden terminal typing game: type as many shell commands as possible in 30 seconds. */
+    class TypingGame {
+        /** Open the game, unless it is already open. Focus returns to `trigger` on close. */
+        static open(trigger) {
+            if (TypingGame.active)
+                return;
+            TypingGame.active = new TypingGame(trigger);
+        }
+        constructor(trigger) {
+            this.trigger = trigger;
+            this.texts = getTexts();
+            this.elements = buildGameDialog(this.texts);
+            this.target = "";
+            this.next = "";
+            this.score = 0;
+            this.correctChars = 0;
+            this.best = GameScoreService.readBest();
+            this.finished = false;
+            const { dialog, input, close } = this.elements;
+            input.addEventListener("input", () => this.handleInput());
+            input.addEventListener("keydown", event => this.handleKeydown(event));
+            close.addEventListener("click", () => dialog.close());
+            dialog.addEventListener("click", () => input.focus());
+            dialog.addEventListener("close", () => this.destroy());
+            document.body.appendChild(dialog);
+            dialog.showModal();
+            this.reset();
+        }
+        // ---- Run lifecycle ----
+        /** Prepare a fresh run; the clock starts with the first keystroke. */
+        reset() {
+            this.stopTimer();
+            this.score = 0;
+            this.correctChars = 0;
+            this.startedAt = undefined;
+            this.finished = false;
+            this.target = pickNextCommand(COMMANDS, undefined, Math.random);
+            this.next = pickNextCommand(COMMANDS, this.target, Math.random);
+            this.elements.input.value = "";
+            renderResult(this.elements, this.texts);
+            renderTime(this.elements, 1);
+            this.render();
+            this.elements.input.focus();
+        }
+        /** Start the countdown. */
+        start() {
+            this.startedAt = performance.now();
+            this.timer = window.setInterval(() => this.tick(), TICK_MS);
+        }
+        /** Update the time bar and end the run when time is up. */
+        tick() {
+            const remaining = 1 - this.elapsed() / RUN_DURATION_MS;
+            renderTime(this.elements, remaining);
+            this.render();
+            if (remaining <= 0)
+                this.finish();
+        }
+        /** Stop the run and show the summary, saving a new best score. */
+        finish() {
+            this.stopTimer();
+            this.finished = true;
+            const isNewBest = this.score > this.best;
+            if (isNewBest) {
+                this.best = this.score;
+                GameScoreService.storeBest(this.score);
+            }
+            renderResult(this.elements, this.texts, { score: this.score, wpm: this.wpm(), isNewBest });
+            this.render();
+        }
+        /** Stop the timer and forget this game, returning focus to the trigger. */
+        destroy() {
+            this.stopTimer();
+            this.elements.dialog.remove();
+            TypingGame.active = undefined;
+            this.trigger.focus();
+        }
+        // ---- Input ----
+        /** Check the typed text, starting the run on the first keystroke. */
+        handleInput() {
+            const { input } = this.elements;
+            if (this.finished) {
+                input.value = "";
+                return;
+            }
+            if (this.startedAt === undefined)
+                this.start();
+            if (compareInput(this.target, input.value).complete)
+                this.advance();
+            this.render();
+        }
+        /** Enter restarts a finished run. Esc is handled by the dialog itself. */
+        handleKeydown(event) {
+            if (event.key != "Enter" || !this.finished)
+                return;
+            event.preventDefault();
+            this.reset();
+        }
+        /** Score the completed command and move on to the next one. */
+        advance() {
+            this.score++;
+            this.correctChars += this.target.length;
+            this.target = this.next;
+            this.next = pickNextCommand(COMMANDS, this.target, Math.random);
+            this.elements.input.value = "";
+        }
+        // ---- Helpers ----
+        /** Repaint the target command and stats. */
+        render() {
+            renderTarget(this.elements.target, this.target, this.elements.input.value);
+            renderStats(this.elements, { score: this.score, wpm: this.wpm(), best: this.best, next: this.next }, this.texts);
+        }
+        /** Words per minute so far, counting completed commands and the current correct prefix. */
+        wpm() {
+            if (this.elapsed() < MIN_WPM_ELAPSED_MS)
+                return 0;
+            const current = compareInput(this.target, this.elements.input.value).correct;
+            return calculateWpm(this.correctChars + current, this.elapsed());
+        }
+        /** Milliseconds since the run started, capped at the run length. */
+        elapsed() {
+            if (this.startedAt === undefined)
+                return 0;
+            return Math.min(performance.now() - this.startedAt, RUN_DURATION_MS);
+        }
+        /** Clear the countdown timer, if any. */
+        stopTimer() {
+            window.clearInterval(this.timer);
+            this.timer = undefined;
+        }
+    }
+
     /** Each language's name written in that language, for screen readers and tooltips. */
     const LANGUAGE_NAMES = { es: "Español", en: "English" };
     /** Top navigation bar with the site name, section links, language selector and theme toggle. */
@@ -668,7 +965,7 @@
             ];
             const header = createTextElement("header", "", ["navbar"]);
             const inner = createTextElement("div", "", ["navbar-inner"]);
-            inner.appendChild(createLink(siteName, "#/", ["navbar-brand"]));
+            inner.appendChild(Navbar.createBrand(siteName));
             const nav = createTextElement("nav", "", ["navbar-links"]);
             nav.setAttribute("aria-label", texts.NAV_LABEL);
             links.forEach(link => {
@@ -693,6 +990,17 @@
                 else
                     link.removeAttribute("aria-current");
             });
+        }
+        /** Create the site name linking home, followed by the "_" cursor that opens the hidden game. */
+        static createBrand(siteName) {
+            const brand = createTextElement("div", "", ["navbar-brand"]);
+            brand.appendChild(createLink(siteName, "#/", ["navbar-brand-link"]));
+            const cursor = createTextElement("button", "_", ["navbar-cursor"]);
+            cursor.setAttribute("aria-label", getTexts().GAME_OPEN);
+            cursor.title = getTexts().GAME_OPEN;
+            cursor.addEventListener("click", () => TypingGame.open(cursor));
+            brand.appendChild(cursor);
+            return brand;
         }
         /** Create the ES · EN selector; the active language is marked as pressed. */
         static createLanguageSelector() {

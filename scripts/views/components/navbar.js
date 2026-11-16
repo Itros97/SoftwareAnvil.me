@@ -3,6 +3,7 @@ import { LANGUAGES } from "../../lib/language.js";
 import { LanguageService } from "../../services/languageservice.js";
 import { Theme } from "../../services/theme.js";
 import { getTexts } from "../texts.js";
+import { TypingGame } from "./typinggame.js";
 import { createLink, createTextElement } from "./elements.js";
 /** Each language's name written in that language, for screen readers and tooltips. */
 const LANGUAGE_NAMES = { es: "Español", en: "English" };
@@ -18,7 +19,7 @@ export class Navbar {
         ];
         const header = createTextElement("header", "", ["navbar"]);
         const inner = createTextElement("div", "", ["navbar-inner"]);
-        inner.appendChild(createLink(siteName, "#/", ["navbar-brand"]));
+        inner.appendChild(Navbar.createBrand(siteName));
         const nav = createTextElement("nav", "", ["navbar-links"]);
         nav.setAttribute("aria-label", texts.NAV_LABEL);
         links.forEach(link => {
@@ -43,6 +44,17 @@ export class Navbar {
             else
                 link.removeAttribute("aria-current");
         });
+    }
+    /** Create the site name linking home, followed by the "_" cursor that opens the hidden game. */
+    static createBrand(siteName) {
+        const brand = createTextElement("div", "", ["navbar-brand"]);
+        brand.appendChild(createLink(siteName, "#/", ["navbar-brand-link"]));
+        const cursor = createTextElement("button", "_", ["navbar-cursor"]);
+        cursor.setAttribute("aria-label", getTexts().GAME_OPEN);
+        cursor.title = getTexts().GAME_OPEN;
+        cursor.addEventListener("click", () => TypingGame.open(cursor));
+        brand.appendChild(cursor);
+        return brand;
     }
     /** Create the ES · EN selector; the active language is marked as pressed. */
     static createLanguageSelector() {
