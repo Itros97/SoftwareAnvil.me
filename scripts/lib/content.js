@@ -21,3 +21,9 @@ export function formatPostDate(isoDate, locale) {
 export function filterNonEmptyGroups(groups) {
     return groups.filter(group => group.items.length > 0);
 }
+/** Return the tree branch drawn before a setup row: none for the root (first) row, a corner for the last one. */
+export function getTreeBranch(index, count) {
+    if (index == 0)
+        return "";
+    return index == count - 1 ? "└─" : "├─";
+}

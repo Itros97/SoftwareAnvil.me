@@ -298,6 +298,12 @@
     function filterNonEmptyGroups(groups) {
         return groups.filter(group => group.items.length > 0);
     }
+    /** Return the tree branch drawn before a setup row: none for the root (first) row, a corner for the last one. */
+    function getTreeBranch(index, count) {
+        if (index == 0)
+            return "";
+        return index == count - 1 ? "└─" : "├─";
+    }
 
     /** Every available language, in selector order. */
     const LANGUAGES = ["es", "en"];
@@ -382,15 +388,9 @@
         static async getAbout() {
             return ContentService.fetchText("about.md");
         }
-        /** Load the computer setup groups; an empty list when the file is missing so the home page still renders. */
+        /** Load the computer setup groups, skipping the empty ones. */
         static async getSetup() {
-            try {
-                return filterNonEmptyGroups(JSON.parse(await ContentService.fetchText("setup.json")));
-            }
-            catch (error) {
-                console.warn(error);
-                return [];
-            }
+            return filterNonEmptyGroups(JSON.parse(await ContentService.fetchText("setup.json")));
         }
         /** Load the markdown body of a post. */
         static async getPostBody(post) {
@@ -531,11 +531,14 @@
         NAV_HOME: "Inicio",
         NAV_PROJECTS: "Proyectos",
         NAV_BLOG: "Blog",
+        NAV_SETUP: "Setup",
         NAV_LABEL: "Principal",
         TOGGLE_THEME: "Cambiar tema",
         LANGUAGE_LABEL: "Idioma",
         ABOUT_TITLE: "Sobre mí",
         SETUP_TITLE: "Mi setup",
+        SETUP_INTRO: "El ordenador y las herramientas con las que trabajo cada día.",
+        SETUP_LINK: "Ver mi setup →",
         PROJECTS_TITLE: "Proyectos",
         PROJECTS_INTRO: "Cosas que he construido o en las que estoy trabajando.",
         BLOG_TITLE: "Blog",
@@ -567,11 +570,14 @@
         NAV_HOME: "Home",
         NAV_PROJECTS: "Projects",
         NAV_BLOG: "Blog",
+        NAV_SETUP: "Setup",
         NAV_LABEL: "Main",
         TOGGLE_THEME: "Toggle theme",
         LANGUAGE_LABEL: "Language",
         ABOUT_TITLE: "About me",
         SETUP_TITLE: "My setup",
+        SETUP_INTRO: "The computer and tools I work with every day.",
+        SETUP_LINK: "See my setup →",
         PROJECTS_TITLE: "Projects",
         PROJECTS_INTRO: "Things I have built or am working on.",
         BLOG_TITLE: "Blog",
@@ -619,24 +625,6 @@
         const list = createTextElement("ul", "", ["entry-list"]);
         posts.forEach(post => list.appendChild(createPostItem(post)));
         return list;
-    }
-    /** Create the setup groups, each as a titled list of label → value rows. */
-    function createSetupList(groups) {
-        const container = createTextElement("div", "", ["setup"]);
-        groups.forEach(group => container.appendChild(createSetupGroup(group)));
-        return container;
-    }
-    /** Create one setup group: its title and a definition list of its rows. */
-    function createSetupGroup(group) {
-        const element = createTextElement("div", "", ["setup-group"]);
-        element.appendChild(createTextElement("h3", group.title, ["setup-group-title"]));
-        const list = createTextElement("dl", "", ["setup-list"]);
-        group.items.forEach(item => {
-            list.appendChild(createTextElement("dt", item.label, ["setup-label"]));
-            list.appendChild(createTextElement("dd", item.value, ["setup-value"]));
-        });
-        element.appendChild(list);
-        return element;
     }
     /** Create one project row: name and year, description, tags. */
     function createProjectItem(project) {
@@ -996,6 +984,7 @@
                 { text: texts.NAV_HOME, section: "" },
                 { text: texts.NAV_PROJECTS, section: "projects" },
                 { text: texts.NAV_BLOG, section: "blog" },
+                { text: texts.NAV_SETUP, section: "setup" },
             ];
             const header = createTextElement("header", "", ["navbar"]);
             const inner = createTextElement("div", "", ["navbar-inner"]);
@@ -2340,7 +2329,7 @@ ${body}</tbody>
         }
     }
 
-    /** Landing page: greeting, about me, setup, featured projects and latest posts. */
+    /** Landing page: greeting, about me, featured projects and latest posts. */
     class HomeView {
         /** Show the home view. */
         static async show(_parameters, container) {
@@ -2348,17 +2337,14 @@ ${body}</tbody>
             const page = createPage(HomeView.VIEW_ID);
             container.appendChild(page);
             try {
-                const [profile, about, setup, projects, posts] = await Promise.all([
+                const [profile, about, projects, posts] = await Promise.all([
                     ContentService.getProfile(),
                     ContentService.getAbout(),
-                    ContentService.getSetup(),
                     ContentService.getProjects(),
                     ContentService.getPosts(),
                 ]);
                 page.appendChild(HomeView.createHero(profile.headline, profile.tagline));
                 page.appendChild(HomeView.createAbout(about));
-                if (setup.length > 0)
-                    page.appendChild(HomeView.createSetup(setup));
                 page.appendChild(HomeView.createSection(getTexts().PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))));
                 page.appendChild(HomeView.createSection(getTexts().LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))));
             }
@@ -2380,13 +2366,7 @@ ${body}</tbody>
             const body = createTextElement("div", "", ["markdown"]);
             body.innerHTML = MarkdownService.render(markdown);
             section.appendChild(body);
-            return section;
-        }
-        /** Create the "my setup" section with the computer specs. */
-        static createSetup(groups) {
-            const section = createTextElement("section", "", ["home-section"]);
-            section.appendChild(createSectionHeader(getTexts().SETUP_TITLE));
-            section.appendChild(createSetupList(groups));
+            section.appendChild(createLink(getTexts().SETUP_LINK, "#/setup", ["section-link", "about-setup-link"]));
             return section;
         }
         /** Create a preview section with a "see all" link. */
@@ -2468,6 +2448,76 @@ ${body}</tbody>
     }
     ProjectsView.VIEW_ID = "projects";
 
+    const ICON_SIZE = "16px";
+    /** Create a terminal window that lists the setup groups like fastfetch: logo on the left, boxed trees on the right. */
+    function createFetchPanel(groups) {
+        const panel = createTextElement("div", "", ["fetch"]);
+        panel.appendChild(createTitleBar());
+        const body = createTextElement("div", "", ["fetch-body"]);
+        body.appendChild(createLogo());
+        const boxes = createTextElement("div", "", ["fetch-boxes"]);
+        groups.forEach(group => boxes.appendChild(createGroupBox(group)));
+        body.appendChild(boxes);
+        panel.appendChild(body);
+        return panel;
+    }
+    /** Create the window bar with the command that "produced" the output. */
+    function createTitleBar() {
+        const bar = createTextElement("div", "", ["fetch-titlebar"]);
+        bar.appendChild(createTextElement("span", "~ $ fastfetch", ["fetch-command"]));
+        return bar;
+    }
+    /** Create the site logo shown next to the boxes; decorative, so screen readers skip it. */
+    function createLogo() {
+        const logo = document.createElement("img");
+        logo.src = `${getConfiguration("path")["icons"]}/logo.svg`;
+        logo.alt = "";
+        logo.classList.add("fetch-logo");
+        return logo;
+    }
+    /** Create one boxed group with its title on the top border and its rows drawn as a tree. */
+    function createGroupBox(group) {
+        const box = createTextElement("section", "", ["fetch-box"]);
+        box.appendChild(createTextElement("h2", group.title, ["fetch-box-title"]));
+        const list = createTextElement("ul", "", ["fetch-rows"]);
+        group.items.forEach((item, index) => list.appendChild(createRow(item, getTreeBranch(index, group.items.length))));
+        box.appendChild(list);
+        return box;
+    }
+    /** Create one row: tree branch, icon, value and what it is in parentheses. */
+    function createRow(item, branch) {
+        const row = createTextElement("li", "", branch ? ["fetch-row"] : ["fetch-row", "fetch-row-root"]);
+        if (branch)
+            row.appendChild(createTextElement("span", branch, ["fetch-branch"]));
+        const icon = item.icon ? getIcon("material", item.icon, ICON_SIZE, "currentColor") : undefined;
+        if (icon) {
+            icon.classList.add("fetch-icon");
+            row.appendChild(icon);
+        }
+        const text = createTextElement("span", item.value, ["fetch-value"]);
+        text.appendChild(createTextElement("span", ` (${item.label})`, ["fetch-label"]));
+        row.appendChild(text);
+        return row;
+    }
+
+    /** Page showing the computer setup as a fastfetch-style terminal panel. */
+    class SetupView {
+        /** Show the setup view. */
+        static async show(_parameters, container) {
+            setPageTitle(getTexts().SETUP_TITLE);
+            const page = createPage(SetupView.VIEW_ID);
+            page.appendChild(createPageHeader(getTexts().SETUP_TITLE, getTexts().SETUP_INTRO));
+            container.appendChild(page);
+            try {
+                page.appendChild(createFetchPanel(await ContentService.getSetup()));
+            }
+            catch (error) {
+                page.appendChild(createErrorState(getTexts().LOAD_ERROR, error));
+            }
+        }
+    }
+    SetupView.VIEW_ID = "setup";
+
     let layout;
     window.addEventListener("hashchange", renderCurrentRoute);
     window.onresize = () => Display.checkType();
@@ -2496,6 +2546,7 @@ ${body}</tbody>
         setRoute("projects", ProjectsView.show);
         setRoute("blog", BlogView.show);
         setRoute("blog/$", PostView.show);
+        setRoute("setup", SetupView.show);
         setNotFoundRoute(NotFoundView.show);
     }
     /** Build the page shell once; the footer socials fill in when the profile loads. */

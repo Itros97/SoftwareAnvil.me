@@ -24,7 +24,8 @@ Personal website of **Itros97**, built as a lightweight single-page application 
 
 ## Features
 
-- Home, projects, blog and post pages with hash-based routing
+- Home, projects, blog, post and setup pages with hash-based routing
+- A fastfetch-style setup page with the computer specs, read from `setup.json`
 - Light and dark themes that follow the system and remember the visitor's choice
 - Spanish and English, picked from the browser language and switchable from the navbar
 - A hidden terminal typing game: click the blinking `_` after the site name

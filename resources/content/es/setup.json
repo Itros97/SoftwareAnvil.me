@@ -3,41 +3,69 @@
 		"title": "Hardware",
 		"items": [
 			{
-				"label": "CPU",
-				"value": "AMD Ryzen 7 7700X (8 núcleos / 16 hilos)"
+				"icon": "computer",
+				"value": "MSI PRO B650-S WIFI",
+				"label": "Placa base"
 			},
 			{
-				"label": "GPU",
-				"value": "AMD Radeon RX 6800, 16 GB"
+				"icon": "memory",
+				"value": "AMD Ryzen 7 7700X, 8 núcleos / 16 hilos",
+				"label": "CPU"
 			},
 			{
-				"label": "RAM",
-				"value": "32 GB DDR5 Corsair Vengeance (2×16 GB, 6400 MT/s CL36)"
+				"icon": "videogame_asset",
+				"value": "AMD Radeon RX 6800, 16 GB",
+				"label": "GPU"
 			},
 			{
-				"label": "Placa base",
-				"value": "MSI PRO B650-S WIFI"
+				"icon": "view_week",
+				"value": "32 GB DDR5 Corsair Vengeance, 2×16 GB, 6400 MT/s CL36",
+				"label": "RAM"
 			},
 			{
-				"label": "Almacenamiento",
-				"value": "Predator GM7 2 TB NVMe · EMTEC X150 2 TB SSD · Samsung 860 EVO 1 TB · 2× Seagate 4 TB HDD"
+				"icon": "monitor",
+				"value": "Philips 346E2LA, 34\" ultrawide, 3440×1440 a 100 Hz",
+				"label": "Monitor principal"
 			},
 			{
-				"label": "Sistema",
-				"value": "Omarchy"
+				"icon": "monitor",
+				"value": "MSI G27C7, 27\", 1920×1080",
+				"label": "Monitor secundario"
+			},
+			{
+				"icon": "storage",
+				"value": "Predator GM7 2 TB NVMe · EMTEC X150 2 TB SSD · Samsung 860 EVO 1 TB · 2× Seagate 4 TB HDD",
+				"label": "Almacenamiento"
 			}
 		]
 	},
 	{
-		"title": "Monitores",
+		"title": "Software",
 		"items": [
 			{
-				"label": "Principal",
-				"value": "Philips 346E2LA, 34\" ultrawide, 3440×1440 a 100 Hz"
+				"icon": "layers",
+				"value": "Omarchy",
+				"label": "Sistema"
 			},
 			{
-				"label": "Secundario",
-				"value": "MSI G27C7, 27\", 1920×1080"
+				"icon": "web_asset",
+				"value": "Hyprland, Wayland",
+				"label": "Gestor de ventanas"
+			},
+			{
+				"icon": "terminal",
+				"value": "foot",
+				"label": "Terminal"
+			},
+			{
+				"icon": "palette",
+				"value": "Ristretto",
+				"label": "Tema"
+			},
+			{
+				"icon": "text_fields",
+				"value": "JetBrainsMono Nerd Font",
+				"label": "Fuente"
 			}
 		]
 	}
