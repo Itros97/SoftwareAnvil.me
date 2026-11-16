@@ -27,6 +27,7 @@ Personal website of **Itros97**, built as a lightweight single-page application 
 - Home, projects, blog and post pages with hash-based routing
 - Light and dark themes that follow the system and remember the visitor's choice
 - Spanish and English, picked from the browser language and switchable from the navbar
+- A hidden terminal typing game: click the blinking `_` after the site name
 - Content written in JSON and Markdown, no code changes needed to update it
 - Material and social SVG icon sets loaded from JSON
 - Responsive layout that adapts to the display type
@@ -134,11 +135,12 @@ I write most of my code by hand, so I want to be clear about this project: **the
 - The pages and components in `src/views/`
 - `src/services/contentservice.ts`, `src/services/theme.ts`, `src/lib/content.ts` and `src/start.ts`
 - The language selector: `src/lib/language.ts`, `src/services/languageservice.ts`, `src/views/texts.ts` and the English placeholder content
+- The typing game: `src/lib/typinggame.ts`, `src/services/gamescoreservice.ts` and `src/views/components/typinggame*.ts`
 - The unit tests in `tests/`, plus this README
 
 Every commit made this way carries a `Co-Authored-By: Claude` line.
 
-**Status: pending thorough review.** It compiles, the unit tests pass, and every page was checked in a headless browser in light and dark themes at desktop and phone widths, and language switching was driven by clicks in a headless browser. I have not yet reviewed it line by line. Treat it as a working draft, not as code I vouch for.
+**Status: pending thorough review.** It compiles, the unit tests pass, and every page was checked in a headless browser in light and dark themes at desktop and phone widths, and language switching and a full game run were driven by clicks and keystrokes in a headless browser. I have not yet reviewed it line by line. Treat it as a working draft, not as code I vouch for.
 
 ## License
 

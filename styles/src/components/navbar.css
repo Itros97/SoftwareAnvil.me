@@ -20,14 +20,39 @@
 }
 
 .navbar-brand {
+	display: flex;
+	align-items: baseline;
 	font-family: var(--font-console);
 	font-weight: 600;
+}
+
+.navbar-brand-link {
 	color: var(--on-background);
 }
 
-.navbar-brand::after {
-	content: "_";
+.navbar-cursor {
+	height: auto;
+	min-width: 0;
+	margin: 0;
+	padding: 0 0.15rem;
+	border-radius: 0.25rem;
+	background: transparent;
 	color: var(--accent-strong);
+	font: inherit;
+	animation: cursor-blink 1.1s steps(1) infinite;
+}
+
+.navbar-cursor:hover,
+.navbar-cursor:focus-visible {
+	filter: none;
+	animation: none;
+	background: var(--accent-soft);
+}
+
+@keyframes cursor-blink {
+	50% {
+		opacity: 0;
+	}
 }
 
 .navbar-links {
