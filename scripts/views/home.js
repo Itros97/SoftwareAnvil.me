@@ -2,9 +2,9 @@ import { takeFeatured } from "../lib/content.js";
 import ContentService from "../services/contentservice.js";
 import MarkdownService from "../services/markdownservice.js";
 import { createErrorState, createPage, createSectionHeader, createTextElement, setPageTitle } from "./components/elements.js";
-import { createPostList, createProjectList } from "./components/lists.js";
+import { createPostList, createProjectList, createSetupList } from "./components/lists.js";
 import { getTexts } from "./texts.js";
-/** Landing page: greeting, about me, featured projects and latest posts. */
+/** Landing page: greeting, about me, setup, featured projects and latest posts. */
 class HomeView {
     /** Show the home view. */
     static async show(_parameters, container) {
@@ -12,14 +12,17 @@ class HomeView {
         const page = createPage(HomeView.VIEW_ID);
         container.appendChild(page);
         try {
-            const [profile, about, projects, posts] = await Promise.all([
+            const [profile, about, setup, projects, posts] = await Promise.all([
                 ContentService.getProfile(),
                 ContentService.getAbout(),
+                ContentService.getSetup(),
                 ContentService.getProjects(),
                 ContentService.getPosts(),
             ]);
             page.appendChild(HomeView.createHero(profile.headline, profile.tagline));
             page.appendChild(HomeView.createAbout(about));
+            if (setup.length > 0)
+                page.appendChild(HomeView.createSetup(setup));
             page.appendChild(HomeView.createSection(getTexts().PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))));
             page.appendChild(HomeView.createSection(getTexts().LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))));
         }
@@ -41,6 +44,13 @@ class HomeView {
         const body = createTextElement("div", "", ["markdown"]);
         body.innerHTML = MarkdownService.render(markdown);
         section.appendChild(body);
+        return section;
+    }
+    /** Create the "my setup" section with the computer specs. */
+    static createSetup(groups) {
+        const section = createTextElement("section", "", ["home-section"]);
+        section.appendChild(createSectionHeader(getTexts().SETUP_TITLE));
+        section.appendChild(createSetupList(groups));
         return section;
     }
     /** Create a preview section with a "see all" link. */

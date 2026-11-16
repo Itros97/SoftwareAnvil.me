@@ -294,6 +294,10 @@
         const date = new Date(year, month - 1, day);
         return date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
     }
+    /** Return the setup groups that have at least one item, keeping their order. */
+    function filterNonEmptyGroups(groups) {
+        return groups.filter(group => group.items.length > 0);
+    }
 
     /** Every available language, in selector order. */
     const LANGUAGES = ["es", "en"];
@@ -377,6 +381,16 @@
         /** Load the "about me" markdown. */
         static async getAbout() {
             return ContentService.fetchText("about.md");
+        }
+        /** Load the computer setup groups; an empty list when the file is missing so the home page still renders. */
+        static async getSetup() {
+            try {
+                return filterNonEmptyGroups(JSON.parse(await ContentService.fetchText("setup.json")));
+            }
+            catch (error) {
+                console.warn(error);
+                return [];
+            }
         }
         /** Load the markdown body of a post. */
         static async getPostBody(post) {
@@ -521,6 +535,7 @@
         TOGGLE_THEME: "Cambiar tema",
         LANGUAGE_LABEL: "Idioma",
         ABOUT_TITLE: "Sobre mí",
+        SETUP_TITLE: "Mi setup",
         PROJECTS_TITLE: "Proyectos",
         PROJECTS_INTRO: "Cosas que he construido o en las que estoy trabajando.",
         BLOG_TITLE: "Blog",
@@ -556,6 +571,7 @@
         TOGGLE_THEME: "Toggle theme",
         LANGUAGE_LABEL: "Language",
         ABOUT_TITLE: "About me",
+        SETUP_TITLE: "My setup",
         PROJECTS_TITLE: "Projects",
         PROJECTS_INTRO: "Things I have built or am working on.",
         BLOG_TITLE: "Blog",
@@ -603,6 +619,24 @@
         const list = createTextElement("ul", "", ["entry-list"]);
         posts.forEach(post => list.appendChild(createPostItem(post)));
         return list;
+    }
+    /** Create the setup groups, each as a titled list of label → value rows. */
+    function createSetupList(groups) {
+        const container = createTextElement("div", "", ["setup"]);
+        groups.forEach(group => container.appendChild(createSetupGroup(group)));
+        return container;
+    }
+    /** Create one setup group: its title and a definition list of its rows. */
+    function createSetupGroup(group) {
+        const element = createTextElement("div", "", ["setup-group"]);
+        element.appendChild(createTextElement("h3", group.title, ["setup-group-title"]));
+        const list = createTextElement("dl", "", ["setup-list"]);
+        group.items.forEach(item => {
+            list.appendChild(createTextElement("dt", item.label, ["setup-label"]));
+            list.appendChild(createTextElement("dd", item.value, ["setup-value"]));
+        });
+        element.appendChild(list);
+        return element;
     }
     /** Create one project row: name and year, description, tags. */
     function createProjectItem(project) {
@@ -2306,7 +2340,7 @@ ${body}</tbody>
         }
     }
 
-    /** Landing page: greeting, about me, featured projects and latest posts. */
+    /** Landing page: greeting, about me, setup, featured projects and latest posts. */
     class HomeView {
         /** Show the home view. */
         static async show(_parameters, container) {
@@ -2314,14 +2348,17 @@ ${body}</tbody>
             const page = createPage(HomeView.VIEW_ID);
             container.appendChild(page);
             try {
-                const [profile, about, projects, posts] = await Promise.all([
+                const [profile, about, setup, projects, posts] = await Promise.all([
                     ContentService.getProfile(),
                     ContentService.getAbout(),
+                    ContentService.getSetup(),
                     ContentService.getProjects(),
                     ContentService.getPosts(),
                 ]);
                 page.appendChild(HomeView.createHero(profile.headline, profile.tagline));
                 page.appendChild(HomeView.createAbout(about));
+                if (setup.length > 0)
+                    page.appendChild(HomeView.createSetup(setup));
                 page.appendChild(HomeView.createSection(getTexts().PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))));
                 page.appendChild(HomeView.createSection(getTexts().LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))));
             }
@@ -2343,6 +2380,13 @@ ${body}</tbody>
             const body = createTextElement("div", "", ["markdown"]);
             body.innerHTML = MarkdownService.render(markdown);
             section.appendChild(body);
+            return section;
+        }
+        /** Create the "my setup" section with the computer specs. */
+        static createSetup(groups) {
+            const section = createTextElement("section", "", ["home-section"]);
+            section.appendChild(createSectionHeader(getTexts().SETUP_TITLE));
+            section.appendChild(createSetupList(groups));
             return section;
         }
         /** Create a preview section with a "see all" link. */

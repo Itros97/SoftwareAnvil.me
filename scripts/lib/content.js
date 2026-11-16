@@ -17,3 +17,7 @@ export function formatPostDate(isoDate, locale) {
     const date = new Date(year, month - 1, day);
     return date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 }
+/** Return the setup groups that have at least one item, keeping their order. */
+export function filterNonEmptyGroups(groups) {
+    return groups.filter(group => group.items.length > 0);
+}

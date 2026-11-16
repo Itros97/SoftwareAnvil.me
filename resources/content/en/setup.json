@@ -1,0 +1,44 @@
+[
+	{
+		"title": "Hardware",
+		"items": [
+			{
+				"label": "CPU",
+				"value": "AMD Ryzen 7 7700X (8 cores / 16 threads)"
+			},
+			{
+				"label": "GPU",
+				"value": "AMD Radeon RX 6800, 16 GB"
+			},
+			{
+				"label": "RAM",
+				"value": "32 GB DDR5 Corsair Vengeance (2×16 GB, 6400 MT/s CL36)"
+			},
+			{
+				"label": "Motherboard",
+				"value": "MSI PRO B650-S WIFI"
+			},
+			{
+				"label": "Storage",
+				"value": "Predator GM7 2 TB NVMe · EMTEC X150 2 TB SSD · Samsung 860 EVO 1 TB · 2× Seagate 4 TB HDD"
+			},
+			{
+				"label": "OS",
+				"value": "Omarchy"
+			}
+		]
+	},
+	{
+		"title": "Monitors",
+		"items": [
+			{
+				"label": "Main",
+				"value": "Philips 346E2LA, 34\" ultrawide, 3440×1440 at 100 Hz"
+			},
+			{
+				"label": "Secondary",
+				"value": "MSI G27C7, 27\", 1920×1080"
+			}
+		]
+	}
+]
