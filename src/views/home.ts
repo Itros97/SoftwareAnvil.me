@@ -3,7 +3,7 @@ import ContentService from "../services/contentservice.js"
 import MarkdownService from "../services/markdownservice.js"
 import { createErrorState, createPage, createSectionHeader, createTextElement, setPageTitle } from "./components/elements.js"
 import { createPostList, createProjectList } from "./components/lists.js"
-import { TEXTS } from "./texts.js"
+import { getTexts } from "./texts.js"
 
 /** Landing page: greeting, about me, featured projects and latest posts. */
 export default class HomeView {
@@ -26,10 +26,10 @@ export default class HomeView {
 
 			page.appendChild(HomeView.createHero(profile.headline, profile.tagline))
 			page.appendChild(HomeView.createAbout(about))
-			page.appendChild(HomeView.createSection(TEXTS.PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))))
-			page.appendChild(HomeView.createSection(TEXTS.LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))))
+			page.appendChild(HomeView.createSection(getTexts().PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))))
+			page.appendChild(HomeView.createSection(getTexts().LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))))
 		} catch (error) {
-			page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error))
+			page.appendChild(createErrorState(getTexts().LOAD_ERROR, error))
 		}
 	}
 
@@ -44,7 +44,7 @@ export default class HomeView {
 	/** Create the "about me" section from its markdown. */
 	private static createAbout(markdown: string): HTMLElement {
 		const section = createTextElement("section", "", ["home-section"])
-		section.appendChild(createSectionHeader(TEXTS.ABOUT_TITLE))
+		section.appendChild(createSectionHeader(getTexts().ABOUT_TITLE))
 		const body = createTextElement("div", "", ["markdown"])
 		body.innerHTML = MarkdownService.render(markdown)
 		section.appendChild(body)
@@ -54,7 +54,7 @@ export default class HomeView {
 	/** Create a preview section with a "see all" link. */
 	private static createSection(title: string, href: string, content: HTMLElement): HTMLElement {
 		const section = createTextElement("section", "", ["home-section"])
-		section.appendChild(createSectionHeader(title, { text: TEXTS.SEE_ALL, href }))
+		section.appendChild(createSectionHeader(title, { text: getTexts().SEE_ALL, href }))
 		section.appendChild(content)
 		return section
 	}
