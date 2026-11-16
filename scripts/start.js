@@ -532,6 +532,7 @@
         NAV_PROJECTS: "Proyectos",
         NAV_BLOG: "Blog",
         NAV_SETUP: "Setup",
+        NAV_CURIOSITIES: "Curiosidades",
         NAV_LABEL: "Principal",
         TOGGLE_THEME: "Cambiar tema",
         LANGUAGE_LABEL: "Idioma",
@@ -539,6 +540,22 @@
         SETUP_TITLE: "Mi setup",
         SETUP_INTRO: "El ordenador y las herramientas con las que trabajo cada día.",
         SETUP_LINK: "Ver mi setup →",
+        CURIOSITIES_TITLE: "Curiosidades",
+        CURIOSITIES_INTRO: "Pequeños experimentos con los que jugar directamente en la página.",
+        COLLATZ_TITLE: "Conjetura de Collatz",
+        COLLATZ_DESCRIPTION: "Elige un número. Si es par, divídelo entre 2; si es impar, multiplícalo por 3 y suma 1. Repite. La conjetura dice que siempre acabarás en 1, pero nadie lo ha demostrado.",
+        COLLATZ_NUMBER_LABEL: "Número inicial",
+        COLLATZ_RUN: "Calcular",
+        COLLATZ_EXAMPLES: "Prueba con:",
+        COLLATZ_STEPS: "pasos",
+        COLLATZ_PEAK: "valor máximo",
+        COLLATZ_CHART_LABEL: "Trayectoria de {n} hasta 1",
+        COLLATZ_RANGE_LABEL: "Comprobar todos hasta",
+        COLLATZ_VERIFY: "Comprobar",
+        COLLATZ_VERIFIED: "✓ Los {checked} números llegan a 1. El que más tarda es el {n}, con {steps} pasos.",
+        INPUT_EMPTY: "Escribe un número.",
+        INPUT_NOT_INTEGER: "Tiene que ser un número entero.",
+        INPUT_OUT_OF_RANGE: "Tiene que estar entre {min} y {max}.",
         PROJECTS_TITLE: "Proyectos",
         PROJECTS_INTRO: "Cosas que he construido o en las que estoy trabajando.",
         BLOG_TITLE: "Blog",
@@ -571,6 +588,7 @@
         NAV_PROJECTS: "Projects",
         NAV_BLOG: "Blog",
         NAV_SETUP: "Setup",
+        NAV_CURIOSITIES: "Curiosities",
         NAV_LABEL: "Main",
         TOGGLE_THEME: "Toggle theme",
         LANGUAGE_LABEL: "Language",
@@ -578,6 +596,22 @@
         SETUP_TITLE: "My setup",
         SETUP_INTRO: "The computer and tools I work with every day.",
         SETUP_LINK: "See my setup →",
+        CURIOSITIES_TITLE: "Curiosities",
+        CURIOSITIES_INTRO: "Small experiments to play with right here on the page.",
+        COLLATZ_TITLE: "Collatz conjecture",
+        COLLATZ_DESCRIPTION: "Pick a number. If it is even, halve it; if it is odd, triple it and add 1. Repeat. The conjecture says you always end up at 1, but nobody has proved it.",
+        COLLATZ_NUMBER_LABEL: "Starting number",
+        COLLATZ_RUN: "Run",
+        COLLATZ_EXAMPLES: "Try:",
+        COLLATZ_STEPS: "steps",
+        COLLATZ_PEAK: "peak",
+        COLLATZ_CHART_LABEL: "Trajectory from {n} down to 1",
+        COLLATZ_RANGE_LABEL: "Check every number up to",
+        COLLATZ_VERIFY: "Check",
+        COLLATZ_VERIFIED: "✓ All {checked} numbers reach 1. The slowest is {n}, with {steps} steps.",
+        INPUT_EMPTY: "Type a number.",
+        INPUT_NOT_INTEGER: "It must be a whole number.",
+        INPUT_OUT_OF_RANGE: "It must be between {min} and {max}.",
         PROJECTS_TITLE: "Projects",
         PROJECTS_INTRO: "Things I have built or am working on.",
         BLOG_TITLE: "Blog",
@@ -608,6 +642,10 @@
     /** The interface texts in the current language. */
     function getTexts() {
         return TEXTS_BY_LANGUAGE[LanguageService.get()];
+    }
+    /** Replace each {key} placeholder of a text with its value. */
+    function fillText(text, values) {
+        return text.replace(/\{(\w+)\}/g, (placeholder, key) => values[key] ?? placeholder);
     }
 
     /** Create the list of projects, or an empty state when there are none. */
@@ -985,6 +1023,7 @@
                 { text: texts.NAV_PROJECTS, section: "projects" },
                 { text: texts.NAV_BLOG, section: "blog" },
                 { text: texts.NAV_SETUP, section: "setup" },
+                { text: texts.NAV_CURIOSITIES, section: "curiosities" },
             ];
             const header = createTextElement("header", "", ["navbar"]);
             const inner = createTextElement("div", "", ["navbar-inner"]);
@@ -2518,6 +2557,248 @@ ${body}</tbody>
     }
     SetupView.VIEW_ID = "setup";
 
+    /** Safety cap: every start below 10^6 reaches 1 in fewer than 600 steps. */
+    const DEFAULT_MAX_STEPS = 10_000;
+    /** The next Collatz term: half of an even number, 3n + 1 of an odd one. */
+    function nextTerm(value) {
+        return value % 2 == 0 ? value / 2 : 3 * value + 1;
+    }
+    /** Every term from n down to 1, both included. */
+    function collatzSequence(n, maxSteps = DEFAULT_MAX_STEPS) {
+        const sequence = [n];
+        let value = n;
+        while (value != 1) {
+            if (sequence.length > maxSteps)
+                throw new Error(`Collatz sequence of ${n} did not reach 1 within ${maxSteps} steps`);
+            value = nextTerm(value);
+            sequence.push(value);
+        }
+        return sequence;
+    }
+    /** Count the steps of a sequence and find its peak. */
+    function summarizeSequence(sequence) {
+        return { steps: sequence.length - 1, peak: Math.max(...sequence) };
+    }
+    /** Check every start from 1 to limit, reusing the step counts of smaller numbers already solved. */
+    function verifyRange(limit, maxSteps = DEFAULT_MAX_STEPS) {
+        const stepsByStart = new Uint16Array(limit + 1);
+        const longest = { n: 1, steps: 0 };
+        for (let start = 2; start <= limit; start++) {
+            let value = start;
+            let steps = 0;
+            // Walk until falling below the start, where the remaining steps are already known
+            while (value >= start) {
+                if (steps > maxSteps)
+                    throw new Error(`Collatz sequence of ${start} did not reach 1 within ${maxSteps} steps`);
+                value = nextTerm(value);
+                steps++;
+            }
+            stepsByStart[start] = steps + stepsByStart[value];
+            if (stepsByStart[start] > longest.steps) {
+                longest.n = start;
+                longest.steps = stepsByStart[start];
+            }
+        }
+        return { checked: limit, longest };
+    }
+    /** Keep the first and last `edge` terms of a long sequence, with null marking the gap between them. */
+    function previewSequence(sequence, edge) {
+        if (sequence.length <= edge * 2 + 1)
+            return sequence;
+        return [...sequence.slice(0, edge), null, ...sequence.slice(-edge)];
+    }
+
+    const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+    const WIDTH = 600;
+    const HEIGHT = 160;
+    const PADDING = 6;
+    /** Create a minimal SVG line chart of the values in order: index on X, value on Y, scaled to fit. */
+    function createLineChart(values, label) {
+        const svg = document.createElementNS(SVG_NAMESPACE, "svg");
+        svg.setAttribute("viewBox", `0 0 ${WIDTH} ${HEIGHT}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+        svg.setAttribute("role", "img");
+        svg.setAttribute("aria-label", label);
+        svg.classList.add("line-chart");
+        const line = document.createElementNS(SVG_NAMESPACE, "polyline");
+        line.setAttribute("points", toPoints(values).join(" "));
+        line.setAttribute("vector-effect", "non-scaling-stroke");
+        line.classList.add("line-chart-line");
+        svg.appendChild(line);
+        return svg;
+    }
+    /** Map each value to "x,y" inside the padded drawing area; y grows downwards in SVG. */
+    function toPoints(values) {
+        const min = Math.min(...values);
+        const range = Math.max(...values) - min || 1;
+        const stepX = (WIDTH - PADDING * 2) / Math.max(values.length - 1, 1);
+        return values.map((value, index) => {
+            const x = PADDING + index * stepX;
+            const y = HEIGHT - PADDING - ((value - min) / range) * (HEIGHT - PADDING * 2);
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+    }
+
+    /** Read a whole number written in plain digits that must lie within [min, max]. */
+    function parseBoundedInteger(input, min, max) {
+        const text = input.trim();
+        if (!text)
+            return { error: "empty" };
+        if (!/^-?\d+$/.test(text))
+            return { error: "not-integer" };
+        const value = Number(text);
+        if (value < min || value > max)
+            return { error: "out-of-range" };
+        return value;
+    }
+    /** Tell apart a parsed number from an input error. */
+    function isInputError(result) {
+        return typeof result != "number";
+    }
+
+    /** Create an inline form that validates a bounded integer and reports errors under the field. */
+    function createNumberForm(options) {
+        const form = document.createElement("form");
+        form.classList.add("number-form");
+        form.noValidate = true;
+        const label = createTextElement("label", options.label, ["number-form-label"]);
+        const input = document.createElement("input");
+        input.type = "text";
+        input.inputMode = "numeric";
+        input.value = String(options.initial);
+        input.classList.add("number-form-input");
+        label.appendChild(input);
+        const button = createTextElement("button", options.button, ["number-form-button"]);
+        button.setAttribute("type", "submit");
+        const error = createTextElement("p", "", ["number-form-error"]);
+        error.setAttribute("role", "alert");
+        error.hidden = true;
+        form.append(label, button, error);
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+            const result = parseBoundedInteger(input.value, options.min, options.max);
+            error.hidden = !isInputError(result);
+            input.setAttribute("aria-invalid", String(isInputError(result)));
+            if (isInputError(result)) {
+                error.textContent = describeInputError(result, options.min, options.max);
+                return;
+            }
+            options.onSubmit(result);
+        });
+        const submitValue = (value) => {
+            input.value = String(value);
+            form.requestSubmit();
+        };
+        return { element: form, submitValue };
+    }
+    /** Turn an input error into a message in the current language. */
+    function describeInputError(result, min, max) {
+        const texts = getTexts();
+        switch (result.error) {
+            case "empty": return texts.INPUT_EMPTY;
+            case "not-integer": return texts.INPUT_NOT_INTEGER;
+            case "out-of-range": return fillText(texts.INPUT_OUT_OF_RANGE, {
+                min: min.toLocaleString(texts.LOCALE),
+                max: max.toLocaleString(texts.LOCALE),
+            });
+        }
+    }
+
+    const MAX_START = 1_000_000;
+    const MAX_RANGE = 100_000;
+    const PREVIEW_EDGE = 12;
+    const EXAMPLES = [27, 97, 871];
+    /** Interactive card that walks a Collatz sequence and checks the conjecture over a range. */
+    function createCollatzCard() {
+        const texts = getTexts();
+        const card = createTextElement("article", "", ["curiosity"]);
+        card.appendChild(createTextElement("h2", texts.COLLATZ_TITLE, ["curiosity-title"]));
+        card.appendChild(createTextElement("p", texts.COLLATZ_DESCRIPTION, ["curiosity-description"]));
+        const sequenceResult = createTextElement("div", "", ["collatz-result"]);
+        sequenceResult.setAttribute("aria-live", "polite");
+        const sequenceForm = createNumberForm({
+            label: texts.COLLATZ_NUMBER_LABEL,
+            button: texts.COLLATZ_RUN,
+            min: 1,
+            max: MAX_START,
+            initial: EXAMPLES[0],
+            onSubmit: start => sequenceResult.replaceChildren(...createSequenceResult(start)),
+        });
+        card.append(sequenceForm.element, createExamples(sequenceForm.submitValue), sequenceResult);
+        const rangeResult = createTextElement("p", "", ["collatz-range-result"]);
+        rangeResult.setAttribute("aria-live", "polite");
+        const rangeForm = createNumberForm({
+            label: texts.COLLATZ_RANGE_LABEL,
+            button: texts.COLLATZ_VERIFY,
+            min: 1,
+            max: MAX_RANGE,
+            initial: 10_000,
+            onSubmit: limit => rangeResult.textContent = describeRange(limit),
+        });
+        card.append(rangeForm.element, rangeResult);
+        // The form is still detached here, so render the first example directly instead of submitting it
+        sequenceResult.replaceChildren(...createSequenceResult(EXAMPLES[0]));
+        return card;
+    }
+    /** Create the "Try: 27 97 871" row of buttons that run an example start. */
+    function createExamples(run) {
+        const row = createTextElement("div", "", ["collatz-examples"]);
+        row.appendChild(createTextElement("span", getTexts().COLLATZ_EXAMPLES));
+        EXAMPLES.forEach(example => {
+            const button = createTextElement("button", String(example), ["collatz-example"]);
+            button.setAttribute("type", "button");
+            button.addEventListener("click", () => run(example));
+            row.appendChild(button);
+        });
+        return row;
+    }
+    /** Create the stats, the shortened sequence and the trajectory chart for one start. */
+    function createSequenceResult(start) {
+        const texts = getTexts();
+        const sequence = collatzSequence(start);
+        const summary = summarizeSequence(sequence);
+        const stats = createTextElement("p", "", ["collatz-stats"]);
+        stats.append(createStat(summary.steps, texts.COLLATZ_STEPS), createStat(summary.peak, texts.COLLATZ_PEAK));
+        const terms = previewSequence(sequence, PREVIEW_EDGE).map(term => term == null ? "…" : formatNumber(term));
+        const preview = createTextElement("p", terms.join(" → "), ["collatz-sequence"]);
+        const chart = createLineChart(sequence, fillText(texts.COLLATZ_CHART_LABEL, { n: formatNumber(start) }));
+        return [stats, preview, chart];
+    }
+    /** Create one big number with its caption. */
+    function createStat(value, caption) {
+        const stat = createTextElement("span", "", ["collatz-stat"]);
+        stat.append(createTextElement("strong", formatNumber(value), ["collatz-stat-value"]), createTextElement("span", caption, ["collatz-stat-caption"]));
+        return stat;
+    }
+    /** Check every start up to limit and describe the outcome. */
+    function describeRange(limit) {
+        const result = verifyRange(limit);
+        return fillText(getTexts().COLLATZ_VERIFIED, {
+            checked: formatNumber(result.checked),
+            n: formatNumber(result.longest.n),
+            steps: formatNumber(result.longest.steps),
+        });
+    }
+    /** Format a number with the digit grouping of the current language. */
+    function formatNumber(value) {
+        return value.toLocaleString(getTexts().LOCALE);
+    }
+
+    /** Every curiosity card, in the order they appear; add new ones here. */
+    const CURIOSITIES = [createCollatzCard];
+    /** Page with small interactive experiments embedded in the site. */
+    class CuriositiesView {
+        /** Show the curiosities view. */
+        static async show(_parameters, container) {
+            setPageTitle(getTexts().CURIOSITIES_TITLE);
+            const page = createPage(CuriositiesView.VIEW_ID);
+            page.appendChild(createPageHeader(getTexts().CURIOSITIES_TITLE, getTexts().CURIOSITIES_INTRO));
+            CURIOSITIES.forEach(createCard => page.appendChild(createCard()));
+            container.appendChild(page);
+        }
+    }
+    CuriositiesView.VIEW_ID = "curiosities";
+
     let layout;
     window.addEventListener("hashchange", renderCurrentRoute);
     window.onresize = () => Display.checkType();
@@ -2547,6 +2828,7 @@ ${body}</tbody>
         setRoute("blog", BlogView.show);
         setRoute("blog/$", PostView.show);
         setRoute("setup", SetupView.show);
+        setRoute("curiosities", CuriositiesView.show);
         setNotFoundRoute(NotFoundView.show);
     }
     /** Build the page shell once; the footer socials fill in when the profile loads. */
