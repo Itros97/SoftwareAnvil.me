@@ -36,7 +36,8 @@ class ContentService {
     /** Request a content file, failing with context on a non-OK response. */
     static async request(file) {
         const url = `${getConfiguration("path")["content"]}/${file}`;
-        const response = await fetch(url);
+        // Revalidate on every load so content edits show up without waiting for the cache to expire
+        const response = await fetch(url, { cache: "no-cache" });
         if (!response.ok)
             throw new Error(`Could not load ${url}: HTTP ${response.status}`);
         return response.text();

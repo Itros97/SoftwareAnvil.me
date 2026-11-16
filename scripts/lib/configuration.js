@@ -10,7 +10,8 @@ const configurationId = "skyleriearts-website-config";
  */
 export async function loadConfiguration(path) {
     assertIdHasBeenChanged();
-    const loadedConfiguration = await fetch(path).then((res) => res.json());
+    // Revalidate on every load so a cached config never mismatches newly deployed code
+    const loadedConfiguration = await fetch(path, { cache: "no-cache" }).then((res) => res.json());
     localStorage[configurationId] = JSON.stringify(loadedConfiguration);
 }
 /**
