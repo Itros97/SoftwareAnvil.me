@@ -1,0 +1,8 @@
+{
+	"name": "Itros",
+	"headline": "Hi, I'm Itros.",
+	"tagline": "Software developer. I write about what I build and what I learn along the way.",
+	"socials": [
+		{ "id": "github", "label": "GitHub", "url": "https://github.com/Itros97" }
+	]
+}

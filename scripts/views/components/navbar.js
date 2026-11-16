@@ -1,23 +1,36 @@
 import { getIcon } from "../../lib/icons.js";
+import { LANGUAGES } from "../../lib/language.js";
+import { LanguageService } from "../../services/languageservice.js";
 import { Theme } from "../../services/theme.js";
-import { TEXTS } from "../texts.js";
+import { getTexts } from "../texts.js";
 import { createLink, createTextElement } from "./elements.js";
-/** Top navigation bar with the site name, section links and theme toggle. */
+/** Each language's name written in that language, for screen readers and tooltips. */
+const LANGUAGE_NAMES = { es: "Español", en: "English" };
+/** Top navigation bar with the site name, section links, language selector and theme toggle. */
 export class Navbar {
-    /** Create the navigation bar. */
+    /** Create the navigation bar in the current language. */
     static create(siteName) {
+        const texts = getTexts();
+        const links = [
+            { text: texts.NAV_HOME, section: "" },
+            { text: texts.NAV_PROJECTS, section: "projects" },
+            { text: texts.NAV_BLOG, section: "blog" },
+        ];
         const header = createTextElement("header", "", ["navbar"]);
         const inner = createTextElement("div", "", ["navbar-inner"]);
         inner.appendChild(createLink(siteName, "#/", ["navbar-brand"]));
         const nav = createTextElement("nav", "", ["navbar-links"]);
-        nav.setAttribute("aria-label", "Main");
-        Navbar.LINKS.forEach(link => {
+        nav.setAttribute("aria-label", texts.NAV_LABEL);
+        links.forEach(link => {
             const anchor = createLink(link.text, `#/${link.section}`, ["navbar-link"]);
             anchor.dataset["section"] = link.section;
             nav.appendChild(anchor);
         });
-        nav.appendChild(Navbar.createThemeToggle());
         inner.appendChild(nav);
+        const actions = createTextElement("div", "", ["navbar-actions"]);
+        actions.appendChild(Navbar.createLanguageSelector());
+        actions.appendChild(Navbar.createThemeToggle());
+        inner.appendChild(actions);
         header.appendChild(inner);
         return header;
     }
@@ -31,11 +44,27 @@ export class Navbar {
                 link.removeAttribute("aria-current");
         });
     }
+    /** Create the ES · EN selector; the active language is marked as pressed. */
+    static createLanguageSelector() {
+        const selector = createTextElement("div", "", ["language-selector"]);
+        selector.setAttribute("role", "group");
+        selector.setAttribute("aria-label", getTexts().LANGUAGE_LABEL);
+        LANGUAGES.forEach(language => {
+            const button = createTextElement("button", language.toUpperCase(), ["language-option"]);
+            button.setAttribute("lang", language);
+            button.setAttribute("aria-label", LANGUAGE_NAMES[language]);
+            button.setAttribute("aria-pressed", String(language == LanguageService.get()));
+            button.title = LANGUAGE_NAMES[language];
+            button.addEventListener("click", () => LanguageService.set(language));
+            selector.appendChild(button);
+        });
+        return selector;
+    }
     /** Create the button that switches between light and dark themes. */
     static createThemeToggle() {
         const button = createTextElement("button", "", ["theme-toggle"]);
-        button.setAttribute("aria-label", TEXTS.TOGGLE_THEME);
-        button.title = TEXTS.TOGGLE_THEME;
+        button.setAttribute("aria-label", getTexts().TOGGLE_THEME);
+        button.title = getTexts().TOGGLE_THEME;
         Navbar.renderThemeIcon(button);
         button.addEventListener("click", () => {
             Theme.toggle();
@@ -49,8 +78,3 @@ export class Navbar {
         button.replaceChildren(icon);
     }
 }
-Navbar.LINKS = [
-    { text: TEXTS.NAV_HOME, section: "" },
-    { text: TEXTS.NAV_PROJECTS, section: "projects" },
-    { text: TEXTS.NAV_BLOG, section: "blog" },
-];

@@ -9,7 +9,7 @@
 	},
 	{
 		"name": "Proyecto de ejemplo",
-		"description": "Sustituye esta entrada por uno de tus proyectos en resources/content/projects.json.",
+		"description": "Sustituye esta entrada por uno de tus proyectos en resources/content/es/projects.json.",
 		"url": "https://github.com/Itros97",
 		"tags": ["Ejemplo"],
 		"year": 2025,

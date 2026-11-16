@@ -1,10 +1,10 @@
 import { formatPostDate } from "../../lib/content.js";
-import { TEXTS } from "../texts.js";
+import { getTexts } from "../texts.js";
 import { createEmptyState, createLink, createTextElement } from "./elements.js";
 /** Create the list of projects, or an empty state when there are none. */
 export function createProjectList(projects) {
     if (projects.length == 0)
-        return createEmptyState(TEXTS.NO_PROJECTS);
+        return createEmptyState(getTexts().NO_PROJECTS);
     const list = createTextElement("ul", "", ["entry-list"]);
     projects.forEach(project => list.appendChild(createProjectItem(project)));
     return list;
@@ -12,7 +12,7 @@ export function createProjectList(projects) {
 /** Create the list of posts, or an empty state when there are none. */
 export function createPostList(posts) {
     if (posts.length == 0)
-        return createEmptyState(TEXTS.NO_POSTS);
+        return createEmptyState(getTexts().NO_POSTS);
     const list = createTextElement("ul", "", ["entry-list"]);
     posts.forEach(post => list.appendChild(createPostItem(post)));
     return list;
@@ -35,7 +35,7 @@ function createPostItem(post) {
     const item = createTextElement("li", "", ["entry"]);
     const title = createTextElement("div", "", ["entry-title"]);
     title.appendChild(createLink(post.title, `#/blog/${post.slug}`, ["entry-link"]));
-    const date = createTextElement("time", formatPostDate(post.date, TEXTS.LOCALE), ["entry-meta"]);
+    const date = createTextElement("time", formatPostDate(post.date, getTexts().LOCALE), ["entry-meta"]);
     date.setAttribute("datetime", post.date);
     title.appendChild(date);
     item.appendChild(title);

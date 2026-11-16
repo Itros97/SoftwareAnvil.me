@@ -1,6 +1,7 @@
 import { getConfiguration } from "../lib/configuration.js";
 import { sortPostsByDate } from "../lib/content.js";
-/** Loads the site content (profile, projects, posts) from the content folder. */
+import { LanguageService } from "./languageservice.js";
+/** Loads the site content (profile, projects, posts) in the current language from the content folder. */
 class ContentService {
     /** Load the site owner's profile. */
     static async getProfile() {
@@ -22,20 +23,21 @@ class ContentService {
     static async getPostBody(post) {
         return ContentService.fetchText(`posts/${post.slug}.md`);
     }
-    /** Fetch a content file as text, caching it for the session. */
+    /** Fetch a content file in the current language as text, caching it for the session. */
     static fetchText(file) {
-        const cached = ContentService.cache.get(file);
+        const path = `${LanguageService.get()}/${file}`;
+        const cached = ContentService.cache.get(path);
         if (cached)
             return cached;
-        const request = ContentService.request(file);
-        ContentService.cache.set(file, request);
+        const request = ContentService.request(path);
+        ContentService.cache.set(path, request);
         // Forget failed requests so the next navigation can retry
-        request.catch(() => ContentService.cache.delete(file));
+        request.catch(() => ContentService.cache.delete(path));
         return request;
     }
     /** Request a content file, failing with context on a non-OK response. */
-    static async request(file) {
-        const url = `${getConfiguration("path")["content"]}/${file}`;
+    static async request(path) {
+        const url = `${getConfiguration("path")["content"]}/${path}`;
         // Revalidate on every load so content edits show up without waiting for the cache to expire
         const response = await fetch(url, { cache: "no-cache" });
         if (!response.ok)

@@ -238,6 +238,43 @@
         return -1;
     }
 
+    function uuidv4() {
+        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16));
+    }
+
+    const buffer = new Map();
+    /**
+     * Set a new signal
+     */
+    function setSignal() {
+        const id = uuidv4();
+        buffer.set(id, []);
+        return id;
+    }
+    /**
+     * Connect a function to a signal
+     * @param id The signal id
+     * @param handler The signal handler function
+     */
+    function connectToSignal(id, handler) {
+        if (false == buffer.has(id)) {
+            console.error(`Error connecting: The signal ${id} does not exist.`);
+            return;
+        }
+        buffer.get(id).push(handler);
+    }
+    /**
+     * Emit a signal with the given dat
+     */
+    async function emitSignal(id, data) {
+        if (false == buffer.has(id))
+            return;
+        const targets = buffer.get(id);
+        for (const target of targets) {
+            target(data);
+        }
+    }
+
     /** Return a copy of the posts sorted from newest to oldest. */
     function sortPostsByDate(posts) {
         return [...posts].sort((a, b) => b.date.localeCompare(a.date));
@@ -258,7 +295,72 @@
         return date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
     }
 
-    /** Loads the site content (profile, projects, posts) from the content folder. */
+    /** Every available language, in selector order. */
+    const LANGUAGES = ["es", "en"];
+    /** Language used when neither the stored choice nor the browser match. */
+    const DEFAULT_LANGUAGE = "es";
+    /** Whether a value is one of the available language codes. */
+    function isLanguageCode(value) {
+        return LANGUAGES.includes(value);
+    }
+    /** Pick the language: a valid stored choice, else the first available browser language, else the default. */
+    function resolveLanguage(stored, browserLanguages) {
+        if (isLanguageCode(stored))
+            return stored;
+        const browserMatch = browserLanguages
+            .map(locale => locale.toLowerCase().split("-")[0])
+            .find(isLanguageCode);
+        return browserMatch ?? DEFAULT_LANGUAGE;
+    }
+
+    const LANGUAGE_CHANGED_SIGNAL = setSignal();
+    const LANGUAGE_STORAGE_KEY = "softwareanvil-language";
+    /** Holds the current language and remembers the visitor's choice. */
+    class LanguageService {
+        /** Apply the saved language, or the best match among the browser languages. */
+        static init() {
+            LanguageService.apply(resolveLanguage(LanguageService.readStored(), navigator.languages));
+        }
+        /** The current language. */
+        static get() {
+            return LanguageService.current;
+        }
+        /** Switch to the given language, remember it and notify listeners. */
+        static set(language) {
+            if (language == LanguageService.current)
+                return;
+            LanguageService.apply(language);
+            LanguageService.store(language);
+            emitSignal(LANGUAGE_CHANGED_SIGNAL, { language });
+        }
+        /** Set the language as current and on the root element. */
+        static apply(language) {
+            LanguageService.current = language;
+            setDomAttributes(document.documentElement, { lang: language });
+        }
+        /** Read the saved language, if storage is available. */
+        static readStored() {
+            try {
+                return localStorage.getItem(LANGUAGE_STORAGE_KEY);
+            }
+            catch {
+                // Storage blocked (private mode): fall back to the browser languages
+                return null;
+            }
+        }
+        /** Save the language, ignoring storage that is blocked. */
+        static store(language) {
+            try {
+                localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+            }
+            catch {
+                // Storage blocked (private mode): the choice lasts only for this visit
+            }
+        }
+    }
+    LanguageService.current = resolveLanguage(undefined, []);
+
+    /** Loads the site content (profile, projects, posts) in the current language from the content folder. */
     class ContentService {
         /** Load the site owner's profile. */
         static async getProfile() {
@@ -280,20 +382,21 @@
         static async getPostBody(post) {
             return ContentService.fetchText(`posts/${post.slug}.md`);
         }
-        /** Fetch a content file as text, caching it for the session. */
+        /** Fetch a content file in the current language as text, caching it for the session. */
         static fetchText(file) {
-            const cached = ContentService.cache.get(file);
+            const path = `${LanguageService.get()}/${file}`;
+            const cached = ContentService.cache.get(path);
             if (cached)
                 return cached;
-            const request = ContentService.request(file);
-            ContentService.cache.set(file, request);
+            const request = ContentService.request(path);
+            ContentService.cache.set(path, request);
             // Forget failed requests so the next navigation can retry
-            request.catch(() => ContentService.cache.delete(file));
+            request.catch(() => ContentService.cache.delete(path));
             return request;
         }
         /** Request a content file, failing with context on a non-OK response. */
-        static async request(file) {
-            const url = `${getConfiguration("path")["content"]}/${file}`;
+        static async request(path) {
+            const url = `${getConfiguration("path")["content"]}/${path}`;
             // Revalidate on every load so content edits show up without waiting for the cache to expire
             const response = await fetch(url, { cache: "no-cache" });
             if (!response.ok)
@@ -302,31 +405,6 @@
         }
     }
     ContentService.cache = new Map();
-
-    function uuidv4() {
-        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16));
-    }
-
-    const buffer = new Map();
-    /**
-     * Set a new signal
-     */
-    function setSignal() {
-        const id = uuidv4();
-        buffer.set(id, []);
-        return id;
-    }
-    /**
-     * Emit a signal with the given dat
-     */
-    async function emitSignal(id, data) {
-        if (false == buffer.has(id))
-            return;
-        const targets = buffer.get(id);
-        for (const target of targets) {
-            target(data);
-        }
-    }
 
     const THEME_CHANGED_SIGNAL = setSignal();
     const THEME_STORAGE_KEY = "softwareanvil-theme";
@@ -434,13 +512,14 @@
         return element;
     }
 
-    /** User-facing interface texts, kept in one place. */
-    const TEXTS = {
+    const ES = {
         LOCALE: "es-ES",
         NAV_HOME: "Inicio",
         NAV_PROJECTS: "Proyectos",
         NAV_BLOG: "Blog",
+        NAV_LABEL: "Principal",
         TOGGLE_THEME: "Cambiar tema",
+        LANGUAGE_LABEL: "Idioma",
         ABOUT_TITLE: "Sobre mí",
         PROJECTS_TITLE: "Proyectos",
         PROJECTS_INTRO: "Cosas que he construido o en las que estoy trabajando.",
@@ -456,11 +535,39 @@
         NOT_FOUND_TEXT: "Esta página no existe.",
         NOT_FOUND_LINK: "← Volver al inicio",
     };
+    const EN = {
+        LOCALE: "en-US",
+        NAV_HOME: "Home",
+        NAV_PROJECTS: "Projects",
+        NAV_BLOG: "Blog",
+        NAV_LABEL: "Main",
+        TOGGLE_THEME: "Toggle theme",
+        LANGUAGE_LABEL: "Language",
+        ABOUT_TITLE: "About me",
+        PROJECTS_TITLE: "Projects",
+        PROJECTS_INTRO: "Things I have built or am working on.",
+        BLOG_TITLE: "Blog",
+        BLOG_INTRO: "Notes on what I build and learn.",
+        LATEST_POSTS_TITLE: "Latest posts",
+        SEE_ALL: "See all →",
+        BACK_TO_BLOG: "← Back to the blog",
+        NO_PROJECTS: "No projects yet.",
+        NO_POSTS: "No posts yet.",
+        LOAD_ERROR: "The content could not be loaded. Try reloading the page.",
+        NOT_FOUND_TITLE: "404",
+        NOT_FOUND_TEXT: "This page does not exist.",
+        NOT_FOUND_LINK: "← Back to home",
+    };
+    const TEXTS_BY_LANGUAGE = { es: ES, en: EN };
+    /** The interface texts in the current language. */
+    function getTexts() {
+        return TEXTS_BY_LANGUAGE[LanguageService.get()];
+    }
 
     /** Create the list of projects, or an empty state when there are none. */
     function createProjectList(projects) {
         if (projects.length == 0)
-            return createEmptyState(TEXTS.NO_PROJECTS);
+            return createEmptyState(getTexts().NO_PROJECTS);
         const list = createTextElement("ul", "", ["entry-list"]);
         projects.forEach(project => list.appendChild(createProjectItem(project)));
         return list;
@@ -468,7 +575,7 @@
     /** Create the list of posts, or an empty state when there are none. */
     function createPostList(posts) {
         if (posts.length == 0)
-            return createEmptyState(TEXTS.NO_POSTS);
+            return createEmptyState(getTexts().NO_POSTS);
         const list = createTextElement("ul", "", ["entry-list"]);
         posts.forEach(post => list.appendChild(createPostItem(post)));
         return list;
@@ -491,7 +598,7 @@
         const item = createTextElement("li", "", ["entry"]);
         const title = createTextElement("div", "", ["entry-title"]);
         title.appendChild(createLink(post.title, `#/blog/${post.slug}`, ["entry-link"]));
-        const date = createTextElement("time", formatPostDate(post.date, TEXTS.LOCALE), ["entry-meta"]);
+        const date = createTextElement("time", formatPostDate(post.date, getTexts().LOCALE), ["entry-meta"]);
         date.setAttribute("datetime", post.date);
         title.appendChild(date);
         item.appendChild(title);
@@ -503,15 +610,15 @@
     class BlogView {
         /** Show the blog view. */
         static async show(_parameters, container) {
-            setPageTitle(TEXTS.BLOG_TITLE);
+            setPageTitle(getTexts().BLOG_TITLE);
             const page = createPage(BlogView.VIEW_ID);
-            page.appendChild(createPageHeader(TEXTS.BLOG_TITLE, TEXTS.BLOG_INTRO));
+            page.appendChild(createPageHeader(getTexts().BLOG_TITLE, getTexts().BLOG_INTRO));
             container.appendChild(page);
             try {
                 page.appendChild(createPostList(await ContentService.getPosts()));
             }
             catch (error) {
-                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+                page.appendChild(createErrorState(getTexts().LOAD_ERROR, error));
             }
         }
     }
@@ -547,22 +654,33 @@
         }
     }
 
-    /** Top navigation bar with the site name, section links and theme toggle. */
+    /** Each language's name written in that language, for screen readers and tooltips. */
+    const LANGUAGE_NAMES = { es: "Español", en: "English" };
+    /** Top navigation bar with the site name, section links, language selector and theme toggle. */
     class Navbar {
-        /** Create the navigation bar. */
+        /** Create the navigation bar in the current language. */
         static create(siteName) {
+            const texts = getTexts();
+            const links = [
+                { text: texts.NAV_HOME, section: "" },
+                { text: texts.NAV_PROJECTS, section: "projects" },
+                { text: texts.NAV_BLOG, section: "blog" },
+            ];
             const header = createTextElement("header", "", ["navbar"]);
             const inner = createTextElement("div", "", ["navbar-inner"]);
             inner.appendChild(createLink(siteName, "#/", ["navbar-brand"]));
             const nav = createTextElement("nav", "", ["navbar-links"]);
-            nav.setAttribute("aria-label", "Main");
-            Navbar.LINKS.forEach(link => {
+            nav.setAttribute("aria-label", texts.NAV_LABEL);
+            links.forEach(link => {
                 const anchor = createLink(link.text, `#/${link.section}`, ["navbar-link"]);
                 anchor.dataset["section"] = link.section;
                 nav.appendChild(anchor);
             });
-            nav.appendChild(Navbar.createThemeToggle());
             inner.appendChild(nav);
+            const actions = createTextElement("div", "", ["navbar-actions"]);
+            actions.appendChild(Navbar.createLanguageSelector());
+            actions.appendChild(Navbar.createThemeToggle());
+            inner.appendChild(actions);
             header.appendChild(inner);
             return header;
         }
@@ -576,11 +694,27 @@
                     link.removeAttribute("aria-current");
             });
         }
+        /** Create the ES · EN selector; the active language is marked as pressed. */
+        static createLanguageSelector() {
+            const selector = createTextElement("div", "", ["language-selector"]);
+            selector.setAttribute("role", "group");
+            selector.setAttribute("aria-label", getTexts().LANGUAGE_LABEL);
+            LANGUAGES.forEach(language => {
+                const button = createTextElement("button", language.toUpperCase(), ["language-option"]);
+                button.setAttribute("lang", language);
+                button.setAttribute("aria-label", LANGUAGE_NAMES[language]);
+                button.setAttribute("aria-pressed", String(language == LanguageService.get()));
+                button.title = LANGUAGE_NAMES[language];
+                button.addEventListener("click", () => LanguageService.set(language));
+                selector.appendChild(button);
+            });
+            return selector;
+        }
         /** Create the button that switches between light and dark themes. */
         static createThemeToggle() {
             const button = createTextElement("button", "", ["theme-toggle"]);
-            button.setAttribute("aria-label", TEXTS.TOGGLE_THEME);
-            button.title = TEXTS.TOGGLE_THEME;
+            button.setAttribute("aria-label", getTexts().TOGGLE_THEME);
+            button.title = getTexts().TOGGLE_THEME;
             Navbar.renderThemeIcon(button);
             button.addEventListener("click", () => {
                 Theme.toggle();
@@ -594,11 +728,6 @@
             button.replaceChildren(icon);
         }
     }
-    Navbar.LINKS = [
-        { text: TEXTS.NAV_HOME, section: "" },
-        { text: TEXTS.NAV_PROJECTS, section: "projects" },
-        { text: TEXTS.NAV_BLOG, section: "blog" },
-    ];
 
     /*
      * @license
@@ -1885,11 +2014,11 @@ ${body}</tbody>
                 ]);
                 page.appendChild(HomeView.createHero(profile.headline, profile.tagline));
                 page.appendChild(HomeView.createAbout(about));
-                page.appendChild(HomeView.createSection(TEXTS.PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))));
-                page.appendChild(HomeView.createSection(TEXTS.LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))));
+                page.appendChild(HomeView.createSection(getTexts().PROJECTS_TITLE, "#/projects", createProjectList(takeFeatured(projects, HomeView.PREVIEW_LIMIT))));
+                page.appendChild(HomeView.createSection(getTexts().LATEST_POSTS_TITLE, "#/blog", createPostList(posts.slice(0, HomeView.PREVIEW_LIMIT))));
             }
             catch (error) {
-                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+                page.appendChild(createErrorState(getTexts().LOAD_ERROR, error));
             }
         }
         /** Create the big greeting at the top of the page. */
@@ -1902,7 +2031,7 @@ ${body}</tbody>
         /** Create the "about me" section from its markdown. */
         static createAbout(markdown) {
             const section = createTextElement("section", "", ["home-section"]);
-            section.appendChild(createSectionHeader(TEXTS.ABOUT_TITLE));
+            section.appendChild(createSectionHeader(getTexts().ABOUT_TITLE));
             const body = createTextElement("div", "", ["markdown"]);
             body.innerHTML = MarkdownService.render(markdown);
             section.appendChild(body);
@@ -1911,7 +2040,7 @@ ${body}</tbody>
         /** Create a preview section with a "see all" link. */
         static createSection(title, href, content) {
             const section = createTextElement("section", "", ["home-section"]);
-            section.appendChild(createSectionHeader(title, { text: TEXTS.SEE_ALL, href }));
+            section.appendChild(createSectionHeader(title, { text: getTexts().SEE_ALL, href }));
             section.appendChild(content);
             return section;
         }
@@ -1923,10 +2052,10 @@ ${body}</tbody>
     class NotFoundView {
         /** Show the not found view. */
         static async show(_parameters, container) {
-            setPageTitle(TEXTS.NOT_FOUND_TITLE);
+            setPageTitle(getTexts().NOT_FOUND_TITLE);
             const page = createPage(NotFoundView.VIEW_ID);
-            page.appendChild(createPageHeader(TEXTS.NOT_FOUND_TITLE, TEXTS.NOT_FOUND_TEXT));
-            page.appendChild(createLink(TEXTS.NOT_FOUND_LINK, "#/", ["back-link"]));
+            page.appendChild(createPageHeader(getTexts().NOT_FOUND_TITLE, getTexts().NOT_FOUND_TEXT));
+            page.appendChild(createLink(getTexts().NOT_FOUND_LINK, "#/", ["back-link"]));
             container.appendChild(page);
         }
     }
@@ -1947,21 +2076,21 @@ ${body}</tbody>
                 }
                 setPageTitle(post.title);
                 const body = await ContentService.getPostBody(post);
-                page.appendChild(createLink(TEXTS.BACK_TO_BLOG, "#/blog", ["back-link"]));
+                page.appendChild(createLink(getTexts().BACK_TO_BLOG, "#/blog", ["back-link"]));
                 page.appendChild(PostView.createHeader(post.title, post.date));
                 const article = createTextElement("article", "", ["markdown"]);
                 article.innerHTML = MarkdownService.render(body);
                 page.appendChild(article);
             }
             catch (error) {
-                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+                page.appendChild(createErrorState(getTexts().LOAD_ERROR, error));
             }
         }
         /** Create the post title and date. */
         static createHeader(title, isoDate) {
             const header = createTextElement("header", "", ["page-header"]);
             header.appendChild(createTextElement("h1", title));
-            const date = createTextElement("time", formatPostDate(isoDate, TEXTS.LOCALE), ["page-intro"]);
+            const date = createTextElement("time", formatPostDate(isoDate, getTexts().LOCALE), ["page-intro"]);
             date.setAttribute("datetime", isoDate);
             header.appendChild(date);
             return header;
@@ -1973,15 +2102,15 @@ ${body}</tbody>
     class ProjectsView {
         /** Show the projects view. */
         static async show(_parameters, container) {
-            setPageTitle(TEXTS.PROJECTS_TITLE);
+            setPageTitle(getTexts().PROJECTS_TITLE);
             const page = createPage(ProjectsView.VIEW_ID);
-            page.appendChild(createPageHeader(TEXTS.PROJECTS_TITLE, TEXTS.PROJECTS_INTRO));
+            page.appendChild(createPageHeader(getTexts().PROJECTS_TITLE, getTexts().PROJECTS_INTRO));
             container.appendChild(page);
             try {
                 page.appendChild(createProjectList(await ContentService.getProjects()));
             }
             catch (error) {
-                page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error));
+                page.appendChild(createErrorState(getTexts().LOAD_ERROR, error));
             }
         }
     }
@@ -1993,6 +2122,7 @@ ${body}</tbody>
     window.onload = async function () {
         await loadConfiguration("gtdf.config.json");
         Theme.init();
+        LanguageService.init();
         Display.checkType();
         const iconsPath = getConfiguration("path")["icons"];
         await Promise.all([
@@ -2002,6 +2132,11 @@ ${body}</tbody>
         registerRoutes();
         layout = mountLayout(getConfiguration("base")["app_name"]);
         renderCurrentRoute();
+        // Rebuild the shell and the current view in the new language, keeping the route
+        connectToSignal(LANGUAGE_CHANGED_SIGNAL, async () => {
+            layout = mountLayout(getConfiguration("base")["app_name"]);
+            renderCurrentRoute();
+        });
     };
     /** Register every view with its route. */
     function registerRoutes() {
