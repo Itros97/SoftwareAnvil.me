@@ -1,0 +1,72 @@
+.page {
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
+	animation: page-in 0.3s ease both;
+}
+
+@keyframes page-in {
+	from {
+		opacity: 0;
+		transform: translateY(0.5rem);
+	}
+}
+
+.page-header h1 {
+	font-size: clamp(2rem, 6vw, 2.75rem);
+}
+
+.page-intro {
+	display: block;
+	margin-top: 0.5rem;
+	color: var(--text-muted);
+	font-size: 1.1rem;
+}
+
+.section-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.section-header h2 {
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.section-link {
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+.back-link {
+	align-self: flex-start;
+	margin-bottom: -1.5rem;
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+.state {
+	padding: 1rem 1.25rem;
+	border-radius: var(--radius);
+	font-size: 0.95rem;
+}
+
+.state-empty {
+	color: var(--text-muted);
+	background: var(--surface-1);
+}
+
+.state-error {
+	color: var(--error);
+	border: 1px solid currentColor;
+}
+
+.page-header + .back-link {
+	margin: -1.5rem 0 0;
+}

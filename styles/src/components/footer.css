@@ -1,0 +1,42 @@
+.footer {
+	border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	max-width: var(--content-width);
+	margin: 0 auto;
+	padding: 1.5rem var(--gutter);
+}
+
+.footer-copy {
+	color: var(--text-muted);
+	font-size: 0.875rem;
+}
+
+.footer-socials {
+	display: flex;
+	gap: 0.25rem;
+}
+
+.footer-social {
+	display: grid;
+	place-items: center;
+	min-width: 2.25rem;
+	height: 2.25rem;
+	border-radius: var(--radius);
+	color: var(--text-muted);
+	font-size: 0.875rem;
+}
+
+.footer-social:hover {
+	color: var(--accent-strong);
+	background: var(--surface-1);
+}
+
+.footer-social div {
+	display: grid;
+}

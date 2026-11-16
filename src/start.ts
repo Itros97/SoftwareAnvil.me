@@ -1,44 +1,75 @@
-import { getConfiguration, loadConfiguration } from "./lib/configuration.js";
-import { Display } from "./lib/display.js";
-import { loadIcons } from "./lib/icons.js";
-import { setNotFoundRoute, setRoute, showRoute } from "./lib/router.js";
-import HomeView from "./views/home.js";
+import { getConfiguration, loadConfiguration } from "./lib/configuration.js"
+import { Display } from "./lib/display.js"
+import { loadIcons } from "./lib/icons.js"
+import { setNotFoundRoute, setRoute, showRoute } from "./lib/router.js"
+import ContentService from "./services/contentservice.js"
+import { Theme } from "./services/theme.js"
+import BlogView from "./views/blog.js"
+import { Footer } from "./views/components/footer.js"
+import { Navbar } from "./views/components/navbar.js"
+import HomeView from "./views/home.js"
+import NotFoundView from "./views/notfound.js"
+import PostView from "./views/post.js"
+import ProjectsView from "./views/projects.js"
 
-/**
- * When the dynamic URL changes loads
- * the correspoding view from the URL
- */
-window.addEventListener("hashchange", start);
+/** The persistent page shell: navbar, the container where views render, footer. */
+interface Layout {
+	navbar: HTMLElement
+	main: HTMLElement
+}
 
-/**
- * When the window is loaded load
- * the app state to show
- */
+let layout: Layout | undefined
+
+window.addEventListener("hashchange", renderCurrentRoute)
+window.onresize = () => Display.checkType()
+
 window.onload = async function () {
-  await loadConfiguration("gtdf.config.json");
-  document.title = getConfiguration("base")["app_name"];
-  Display.checkType();
+	await loadConfiguration("gtdf.config.json")
+	Theme.init()
+	Display.checkType()
 
-  await loadIcons(
-    "material",
-    `${getConfiguration("path")["icons"]}/materialicons.json`,
-  );
-  await loadIcons(
-    "social",
-    `${getConfiguration("path")["icons"]}/socialicons.json`,
-  );
+	const iconsPath = getConfiguration("path")["icons"]
+	await Promise.all([
+		loadIcons("material", `${iconsPath}/materialicons.json`),
+		loadIcons("social", `${iconsPath}/socialicons.json`),
+	])
 
-  await start();
-};
+	registerRoutes()
+	layout = mountLayout(getConfiguration("base")["app_name"])
+	renderCurrentRoute()
+}
 
-window.onresize = async function () {
-  Display.checkType();
-};
+/** Register every view with its route. */
+function registerRoutes(): void {
+	setRoute("", HomeView.show)
+	setRoute("projects", ProjectsView.show)
+	setRoute("blog", BlogView.show)
+	setRoute("blog/$", PostView.show)
+	setNotFoundRoute(NotFoundView.show)
+}
 
-/** Start the web app     */
-async function start() {
-  setRoute("", HomeView.show);
+/** Build the page shell once; the footer socials fill in when the profile loads. */
+function mountLayout(siteName: string): Layout {
+	const navbar = Navbar.create(siteName)
+	const main = document.createElement("main")
+	main.classList.add("content")
+	const footer = Footer.create(siteName)
+	document.body.replaceChildren(navbar, main, footer)
 
-  //bsetNotFoundRoute();
-  showRoute(window.location.hash.slice(1).toLowerCase(), document.body);
+	// Without a profile the footer keeps just the copyright line; views show their own error
+	ContentService.getProfile()
+		.then(profile => Footer.setSocials(footer, profile.socials))
+		.catch(error => console.error(error))
+
+	return { navbar, main }
+}
+
+/** Show the view for the current URL hash, e.g. "#/blog/my-post" -> "blog/my-post". */
+function renderCurrentRoute(): void {
+	if (!layout) return
+
+	const path = window.location.hash.replace(/^#\/?/, "").replace(/\/$/, "").toLowerCase()
+	Navbar.highlight(layout.navbar, path)
+	showRoute(path, layout.main)
+	window.scrollTo(0, 0)
 }

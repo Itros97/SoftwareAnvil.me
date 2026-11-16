@@ -64,7 +64,7 @@ export function showRoute(path: string, container : HTMLElement) {
   for (const route of keys) {
 
     // Check if route matches
-    const regexp = RegExp(route)
+    const regexp = RegExp(`^${route}$`)
     const params = path.match(regexp)
 
     if(null != params && 0 != params.length){
