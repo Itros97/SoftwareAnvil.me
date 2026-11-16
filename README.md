@@ -26,6 +26,7 @@ Personal website of **Itros97**, built as a lightweight single-page application 
 
 - Home, projects, blog and post pages with hash-based routing
 - Light and dark themes that follow the system and remember the visitor's choice
+- Spanish and English, picked from the browser language and switchable from the navbar
 - Content written in JSON and Markdown, no code changes needed to update it
 - Material and social SVG icon sets loaded from JSON
 - Responsive layout that adapts to the display type
@@ -54,7 +55,7 @@ Personal website of **Itros97**, built as a lightweight single-page application 
 ├── styles/src/             # CSS sources (master.css imports components and views)
 ├── resources/
 │   ├── icons/              # Logo and icon sets (JSON)
-│   └── content/            # Profile, projects, posts and about text
+│   └── content/            # Profile, projects, posts and about text, one folder per language (es, en)
 ├── tests/                  # Unit tests (node --test)
 ├── bin/lit                 # CSS minifier used in CI
 ├── server-n-cache.py       # Local dev server with caching disabled
@@ -102,7 +103,7 @@ The app reads `gtdf.config.json` at startup:
 
 ## Writing content
 
-All the content lives in `resources/content/`. Editing it needs no rebuild.
+All the content lives in `resources/content/`, with one folder per language: `es/` and `en/`. Both folders have the same files. Editing them needs no rebuild.
 
 | File                 | What it controls                                                    |
 | -------------------- | ------------------------------------------------------------------- |
@@ -112,7 +113,9 @@ All the content lives in `resources/content/`. Editing it needs no rebuild.
 | `posts.json`         | Posts index: `slug`, `title`, `date` (`YYYY-MM-DD`) and `summary`   |
 | `posts/<slug>.md`    | The body of each post                                               |
 
-To publish a post, add its Markdown file to `posts/` and an entry with the same `slug` to `posts.json`. Posts are sorted by date automatically.
+To publish a post, add its Markdown file to `posts/` and an entry with the same `slug` to `posts.json`, inside the folder of each language you want it in. Each language has its own post list, so a post that only exists in `es/` does not appear in the English blog. Posts are sorted by date automatically.
+
+Interface texts (navigation, headings, messages) live in `src/views/texts.ts`. Every language must define every text, or the build fails.
 
 ## Deployment
 
@@ -130,11 +133,12 @@ I write most of my code by hand, so I want to be clear about this project: **the
 - The new styles in `styles/src/`
 - The pages and components in `src/views/`
 - `src/services/contentservice.ts`, `src/services/theme.ts`, `src/lib/content.ts` and `src/start.ts`
+- The language selector: `src/lib/language.ts`, `src/services/languageservice.ts`, `src/views/texts.ts` and the English placeholder content
 - The unit tests in `tests/`, plus this README
 
 Every commit made this way carries a `Co-Authored-By: Claude` line.
 
-**Status: pending thorough review.** It compiles, the unit tests pass, and every page was checked in a headless browser in light and dark themes at desktop and phone widths. I have not yet reviewed it line by line. Treat it as a working draft, not as code I vouch for.
+**Status: pending thorough review.** It compiles, the unit tests pass, and every page was checked in a headless browser in light and dark themes at desktop and phone widths, and language switching was driven by clicks in a headless browser. I have not yet reviewed it line by line. Treat it as a working draft, not as code I vouch for.
 
 ## License
 

@@ -2,7 +2,9 @@ import { getConfiguration, loadConfiguration } from "./lib/configuration.js"
 import { Display } from "./lib/display.js"
 import { loadIcons } from "./lib/icons.js"
 import { setNotFoundRoute, setRoute, showRoute } from "./lib/router.js"
+import { connectToSignal } from "./lib/signals.js"
 import ContentService from "./services/contentservice.js"
+import { LANGUAGE_CHANGED_SIGNAL, LanguageService } from "./services/languageservice.js"
 import { Theme } from "./services/theme.js"
 import BlogView from "./views/blog.js"
 import { Footer } from "./views/components/footer.js"
@@ -26,6 +28,7 @@ window.onresize = () => Display.checkType()
 window.onload = async function () {
 	await loadConfiguration("gtdf.config.json")
 	Theme.init()
+	LanguageService.init()
 	Display.checkType()
 
 	const iconsPath = getConfiguration("path")["icons"]
@@ -37,6 +40,12 @@ window.onload = async function () {
 	registerRoutes()
 	layout = mountLayout(getConfiguration("base")["app_name"])
 	renderCurrentRoute()
+
+	// Rebuild the shell and the current view in the new language, keeping the route
+	connectToSignal(LANGUAGE_CHANGED_SIGNAL, async () => {
+		layout = mountLayout(getConfiguration("base")["app_name"])
+		renderCurrentRoute()
+	})
 }
 
 /** Register every view with its route. */

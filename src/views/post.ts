@@ -3,7 +3,7 @@ import ContentService from "../services/contentservice.js"
 import MarkdownService from "../services/markdownservice.js"
 import { createErrorState, createLink, createPage, createTextElement, setPageTitle } from "./components/elements.js"
 import NotFoundView from "./notfound.js"
-import { TEXTS } from "./texts.js"
+import { getTexts } from "./texts.js"
 
 /** Page showing a single post. Expects the post slug as the first route parameter. */
 export default class PostView {
@@ -24,14 +24,14 @@ export default class PostView {
 
 			setPageTitle(post.title)
 			const body = await ContentService.getPostBody(post)
-			page.appendChild(createLink(TEXTS.BACK_TO_BLOG, "#/blog", ["back-link"]))
+			page.appendChild(createLink(getTexts().BACK_TO_BLOG, "#/blog", ["back-link"]))
 			page.appendChild(PostView.createHeader(post.title, post.date))
 
 			const article = createTextElement("article", "", ["markdown"])
 			article.innerHTML = MarkdownService.render(body)
 			page.appendChild(article)
 		} catch (error) {
-			page.appendChild(createErrorState(TEXTS.LOAD_ERROR, error))
+			page.appendChild(createErrorState(getTexts().LOAD_ERROR, error))
 		}
 	}
 
@@ -39,7 +39,7 @@ export default class PostView {
 	private static createHeader(title: string, isoDate: string): HTMLElement {
 		const header = createTextElement("header", "", ["page-header"])
 		header.appendChild(createTextElement("h1", title))
-		const date = createTextElement("time", formatPostDate(isoDate, TEXTS.LOCALE), ["page-intro"])
+		const date = createTextElement("time", formatPostDate(isoDate, getTexts().LOCALE), ["page-intro"])
 		date.setAttribute("datetime", isoDate)
 		header.appendChild(date)
 		return header

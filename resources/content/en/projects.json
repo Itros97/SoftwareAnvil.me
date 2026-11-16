@@ -1,0 +1,26 @@
+[
+	{
+		"name": "SoftwareAnvil.me",
+		"description": "This website: a framework-free TypeScript SPA published on GitHub Pages.",
+		"url": "https://github.com/Itros97/SoftwareAnvil.me",
+		"tags": ["TypeScript", "CSS"],
+		"year": 2025,
+		"featured": true
+	},
+	{
+		"name": "Sample project",
+		"description": "Replace this entry with one of your projects in resources/content/en/projects.json.",
+		"url": "https://github.com/Itros97",
+		"tags": ["Sample"],
+		"year": 2025,
+		"featured": true
+	},
+	{
+		"name": "Another project",
+		"description": "Projects with \"featured\": false only appear on the projects page.",
+		"url": "https://github.com/Itros97",
+		"tags": ["Sample"],
+		"year": 2024,
+		"featured": false
+	}
+]
