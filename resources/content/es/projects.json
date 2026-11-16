@@ -8,19 +8,51 @@
 		"featured": true
 	},
 	{
-		"name": "Proyecto de ejemplo",
-		"description": "Sustituye esta entrada por uno de tus proyectos en resources/content/es/projects.json.",
-		"url": "https://github.com/Itros97",
-		"tags": ["Ejemplo"],
-		"year": 2025,
+		"name": "MUSA",
+		"description": "App local-first de inventario y ventas para artistas digitales que también venden producto físico. Funciona en Android, escritorio e iOS.",
+		"url": "https://github.com/Itros97/MUSA",
+		"tags": ["Kotlin", "Compose Multiplatform", "SQLite"],
+		"year": 2026,
 		"featured": true
 	},
 	{
-		"name": "Otro proyecto",
-		"description": "Los proyectos con \"featured\": false solo aparecen en la página de proyectos.",
-		"url": "https://github.com/Itros97",
-		"tags": ["Ejemplo"],
-		"year": 2024,
+		"name": "script-launcher",
+		"description": "Una ventana de escritorio para guardar tus scripts y ejecutarlos con un clic, viendo la salida en directo.",
+		"url": "https://github.com/Itros97/script-launcher",
+		"tags": ["Go", "Desktop"],
+		"year": 2026,
+		"featured": true
+	},
+	{
+		"name": "GrimWorld",
+		"description": "Un juego hecho con Godot.",
+		"url": "https://github.com/Itros97/GrimWorld",
+		"tags": ["Godot", "GDScript"],
+		"year": 2026,
+		"featured": false
+	},
+	{
+		"name": "PMythMaker",
+		"description": "Asistente de bolsillo open source para crear nombres, culturas, apellidos y lore para worldbuilding.",
+		"url": "https://github.com/Itros97/PMythMaker",
+		"tags": ["Kotlin", "Worldbuilding"],
+		"year": 2025,
+		"featured": false
+	},
+	{
+		"name": "archmageTower",
+		"description": "Un pequeño juego idle.",
+		"url": "https://github.com/Itros97/archmageTower",
+		"tags": ["Godot", "GDScript"],
+		"year": 2026,
+		"featured": false
+	},
+	{
+		"name": "Grimory",
+		"description": "Un pequeño juego de tower defense.",
+		"url": "https://github.com/Itros97/Grimory",
+		"tags": ["Godot", "GDScript"],
+		"year": 2025,
 		"featured": false
 	}
 ]
