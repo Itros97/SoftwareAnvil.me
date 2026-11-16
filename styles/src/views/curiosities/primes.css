@@ -1,0 +1,66 @@
+.sieve-grid {
+	display: grid;
+	grid-template-columns: repeat(20, 1fr);
+	gap: 2px;
+	font-family: var(--font-console);
+	font-size: 0.7rem;
+}
+
+.sieve-cell {
+	display: grid;
+	aspect-ratio: 1;
+	place-items: center;
+	border-radius: 0.2rem;
+	background: var(--background);
+	color: var(--on-background);
+	transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+}
+
+.sieve-cell:first-child {
+	opacity: 0.35;
+}
+
+.sieve-cell.is-crossed {
+	color: var(--text-muted);
+	opacity: 0.35;
+	text-decoration: line-through;
+}
+
+.sieve-cell.is-prime {
+	background: var(--accent-soft);
+	color: var(--accent);
+	font-weight: 600;
+}
+
+.sieve-cell.is-current {
+	background: var(--accent);
+	color: var(--background);
+}
+
+.sieve-status {
+	min-height: 1.6em;
+	font-size: 0.95rem;
+}
+
+.ulam-frame {
+	display: grid;
+	place-items: center;
+	padding: 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--background);
+}
+
+.ulam-spiral {
+	width: 100%;
+	max-width: 28rem;
+	aspect-ratio: 1;
+	fill: var(--accent);
+}
+
+@media (max-width: 36rem) {
+	.sieve-grid {
+		grid-template-columns: repeat(10, 1fr);
+		font-size: 0.75rem;
+	}
+}

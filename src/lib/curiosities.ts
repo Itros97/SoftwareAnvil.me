@@ -1,8 +1,8 @@
 /** The groups curiosities are listed under. */
-export type CuriosityCategory = "math"
+export type CuriosityCategory = "math" | "physics" | "programming"
 
 /** Order in which categories appear on the index. */
-export const CATEGORY_ORDER: CuriosityCategory[] = ["math"]
+export const CATEGORY_ORDER: CuriosityCategory[] = ["math", "physics", "programming"]
 
 /** Items that share a category, in their original order. */
 export interface CategoryGroup<Category, Item> {

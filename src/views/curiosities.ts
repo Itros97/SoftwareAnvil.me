@@ -21,20 +21,26 @@ export default class CuriositiesView {
 	private static createCategory(category: CuriosityCategory, curiosities: Curiosity[]): HTMLElement {
 		const section = createTextElement("section", "", ["curiosity-category"])
 		section.appendChild(createSectionHeader(getCategoryTitle(category)))
-		const list = createTextElement("ul", "", ["entry-list"])
+		const list = createTextElement("ul", "", ["curiosity-list"])
 		curiosities.forEach(curiosity => list.appendChild(CuriositiesView.createItem(curiosity)))
 		section.appendChild(list)
 		return section
 	}
 
-	/** Create one row: title linking to the curiosity page, then its one-line summary. */
+	/** Create one card, entirely clickable, with title, summary and a "Try it" call to action. */
 	private static createItem(curiosity: Curiosity): HTMLElement {
 		const texts = getTexts()
-		const item = createTextElement("li", "", ["entry"])
-		const title = createTextElement("div", "", ["entry-title"])
-		title.appendChild(createLink(texts[curiosity.title], `#/curiosities/${curiosity.slug}`, ["entry-link"]))
-		item.appendChild(title)
-		item.appendChild(createTextElement("p", texts[curiosity.summary], ["entry-description"]))
+		const item = createTextElement("li", "", ["curiosity-entry"])
+		const link = createLink("", `#/curiosities/${curiosity.slug}`, ["curiosity-entry-link"])
+		const body = createTextElement("span", "", ["curiosity-entry-body"])
+		body.append(
+			createTextElement("strong", texts[curiosity.title], ["curiosity-entry-title"]),
+			createTextElement("span", texts[curiosity.summary], ["curiosity-entry-summary"]),
+		)
+		const call = createTextElement("span", texts.CURIOSITY_TRY, ["curiosity-entry-try"])
+		call.setAttribute("aria-hidden", "true")
+		link.append(body, call)
+		item.appendChild(link)
 		return item
 	}
 }

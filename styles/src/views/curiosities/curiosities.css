@@ -1,3 +1,82 @@
+@import url("./collatz.css");
+@import url("./primes.css");
+@import url("./rectifier.css");
+@import url("./compiler.css");
+
+/* Index: whole-card links with a visible call to action */
+.curiosity-category .section-header {
+	margin-bottom: 0.75rem;
+}
+
+.curiosity-list {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.curiosity-entry-link {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--border);
+	border-radius: 0.75rem;
+	background: var(--surface-1);
+	color: var(--on-background);
+	text-decoration: none;
+	transition: border-color var(--transition), transform var(--transition);
+}
+
+.curiosity-entry-link:hover,
+.curiosity-entry-link:focus-visible {
+	border-color: var(--accent);
+	transform: translateY(-2px);
+}
+
+.curiosity-entry-body {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 0.2rem;
+	min-width: 0;
+}
+
+.curiosity-entry-title {
+	font-weight: 600;
+}
+
+.curiosity-entry-summary {
+	color: var(--text-muted);
+	font-size: 0.92rem;
+}
+
+.curiosity-entry-try {
+	flex-shrink: 0;
+	padding: 0.35rem 0.8rem;
+	border-radius: 999px;
+	background: var(--accent-soft);
+	color: var(--accent);
+	font-size: 0.85rem;
+	font-weight: 600;
+	transition: background var(--transition), color var(--transition);
+}
+
+.curiosity-entry-link:hover .curiosity-entry-try,
+.curiosity-entry-link:focus-visible .curiosity-entry-try {
+	background: var(--accent);
+	color: var(--background);
+}
+
+/* Detail pages: shared panel pieces */
+#curiosity .page-intro {
+	font-size: 1rem;
+}
+
+.curiosity-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
 .curiosity {
 	display: flex;
 	flex-direction: column;
@@ -8,163 +87,63 @@
 	background: var(--surface-1);
 }
 
-#curiosity .page-intro {
-	font-size: 1rem;
+.curiosity-subtitle {
+	font-size: 1.15rem;
 }
 
-.number-form {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-end;
-	gap: 0.5rem 0.75rem;
-}
-
-.number-form-label {
-	display: flex;
-	flex-direction: column;
-	gap: 0.3rem;
+.curiosity-text,
+.curiosity-note {
 	color: var(--text-muted);
-	font-size: 0.85rem;
-	font-weight: 500;
 }
 
-.number-form-input {
-	width: 10rem;
-	height: 2.4rem;
-	margin: 0;
-	padding: 0 0.75rem;
-	border: 1px solid var(--border);
-	border-radius: var(--radius);
-	background: var(--background);
-	color: var(--on-background);
-	font-family: var(--font-console);
-	font-size: 0.95rem;
-}
-
-.number-form-input:focus-visible {
-	outline: 2px solid var(--accent);
-	outline-offset: 1px;
-}
-
-.number-form-input[aria-invalid="true"] {
-	border-color: var(--error);
-}
-
-.number-form-button,
-.collatz-example {
-	height: 2.4rem;
-	min-width: 0;
-	margin: 0;
-	padding: 0 1rem;
-	border-radius: var(--radius);
-	background: var(--accent);
-	color: var(--background);
-	font-weight: 600;
-	transition: background var(--transition);
-}
-
-.number-form-button:hover,
-.number-form-button:focus-visible {
-	filter: none;
-	background: var(--accent-strong);
-}
-
-.number-form-error {
-	width: 100%;
-	color: var(--error);
+.curiosity-note {
 	font-size: 0.85rem;
 }
 
-.collatz-examples {
+.curiosity-actions,
+.curiosity-examples {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.4rem;
+}
+
+.curiosity-examples {
 	color: var(--text-muted);
 	font-size: 0.85rem;
 }
 
-.collatz-example {
-	height: auto;
-	padding: 0.15rem 0.6rem;
-	border: 1px solid var(--border);
-	background: var(--background);
-	color: var(--on-background);
-	font-family: var(--font-console);
-	font-weight: 400;
-}
-
-.collatz-example:hover,
-.collatz-example:focus-visible {
-	filter: none;
-	background: var(--accent-soft);
-	color: var(--accent);
-}
-
-.collatz-result {
+.curiosity-stats {
 	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
+	flex-wrap: wrap;
+	gap: 0.75rem 2rem;
 }
 
-.collatz-stats {
-	display: flex;
-	gap: 2rem;
-}
-
-.collatz-stat {
+.curiosity-stat {
 	display: flex;
 	flex-direction: column;
 }
 
-.collatz-stat-value {
+.curiosity-stat-value {
 	color: var(--accent);
 	font-family: var(--font-console);
 	font-size: 1.6rem;
 	line-height: 1.2;
 }
 
-.collatz-stat-caption {
+.curiosity-stat-caption {
 	color: var(--text-muted);
 	font-size: 0.8rem;
 }
 
-.collatz-sequence {
-	color: var(--text-muted);
-	font-family: var(--font-console);
-	font-size: 0.8rem;
-	overflow-wrap: anywhere;
-}
+@media (max-width: 30rem) {
+	.curiosity {
+		padding: 1rem;
+	}
 
-.line-chart {
-	width: 100%;
-	height: 10rem;
-	border: 1px solid var(--border);
-	border-radius: var(--radius);
-	background: var(--background);
-}
-
-.line-chart-line {
-	fill: none;
-	stroke: var(--accent);
-	stroke-width: 2;
-	stroke-linejoin: round;
-}
-
-.collatz-range-result:empty {
-	display: none;
-}
-
-.collatz-range-result {
-	color: var(--on-background);
-	font-size: 0.95rem;
-}
-
-.number-form + .collatz-examples {
-	margin-top: -0.5rem;
-}
-
-.collatz-result + .number-form {
-	padding-top: 1rem;
-	border-top: 1px solid var(--border);
+	.curiosity-entry-link {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
 }

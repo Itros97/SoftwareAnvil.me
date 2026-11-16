@@ -1,0 +1,52 @@
+.number-form + .curiosity-examples {
+	margin-top: -0.5rem;
+}
+
+.collatz-result {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.collatz-sequence {
+	color: var(--text-muted);
+	font-family: var(--font-console);
+	font-size: 0.8rem;
+	overflow-wrap: anywhere;
+}
+
+.collatz-result + .number-form {
+	padding-top: 1rem;
+	border-top: 1px solid var(--border);
+}
+
+.collatz-range-result {
+	color: var(--on-background);
+	font-size: 0.95rem;
+}
+
+.collatz-range-result:empty {
+	display: none;
+}
+
+/* Shared line chart, also used by the rectifier */
+.line-chart {
+	width: 100%;
+	height: 10rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--background);
+}
+
+.line-chart-line {
+	fill: none;
+	stroke: var(--accent);
+	stroke-width: 2;
+	stroke-linejoin: round;
+}
+
+.line-chart-baseline {
+	stroke: var(--text-muted);
+	stroke-width: 1;
+	stroke-dasharray: 4 4;
+}

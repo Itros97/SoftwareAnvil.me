@@ -1,0 +1,126 @@
+/* Inline form: labelled input, submit button and an error line below */
+.number-form {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.5rem 0.75rem;
+}
+
+.number-form-label,
+.slider {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	color: var(--text-muted);
+	font-size: 0.85rem;
+	font-weight: 500;
+}
+
+.number-form-input {
+	width: 10rem;
+	height: 2.4rem;
+	margin: 0;
+	padding: 0 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--background);
+	color: var(--on-background);
+	font-family: var(--font-console);
+	font-size: 0.95rem;
+}
+
+.number-form-input:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 1px;
+}
+
+.number-form-input[aria-invalid="true"] {
+	border-color: var(--error);
+}
+
+.number-form-error {
+	width: 100%;
+	color: var(--error);
+	font-size: 0.85rem;
+}
+
+/* Buttons: filled for the main action, outlined for the rest */
+.number-form-button,
+.curiosity-button,
+.curiosity-example,
+.segmented-option {
+	height: 2.4rem;
+	min-width: 0;
+	margin: 0;
+	padding: 0 1rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--background);
+	color: var(--on-background);
+	font-weight: 500;
+	transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.number-form-button {
+	border-color: var(--accent);
+	background: var(--accent);
+	color: var(--background);
+	font-weight: 600;
+}
+
+.curiosity-example {
+	height: auto;
+	padding: 0.15rem 0.6rem;
+	font-family: var(--font-console);
+	font-weight: 400;
+}
+
+.number-form-button:hover,
+.number-form-button:focus-visible {
+	filter: none;
+	background: var(--accent-strong);
+}
+
+.curiosity-button:hover:not([disabled]),
+.curiosity-example:hover,
+.segmented-option:hover {
+	filter: none;
+	border-color: var(--accent);
+	color: var(--accent);
+}
+
+.curiosity-button[disabled] {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.segmented {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.segmented-option[aria-pressed="true"] {
+	border-color: var(--accent);
+	background: var(--accent-soft);
+	color: var(--accent);
+	font-weight: 600;
+}
+
+/* Range slider with its current value on the right of the label */
+.slider-header {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.slider-value {
+	color: var(--on-background);
+	font-family: var(--font-console);
+}
+
+.slider-input {
+	width: 100%;
+	margin: 0;
+	accent-color: var(--accent);
+}
