@@ -1,0 +1,86 @@
+.navbar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	border-bottom: 1px solid var(--border);
+	background: color-mix(in srgb, var(--background) 85%, transparent);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+}
+
+.navbar-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	max-width: var(--content-width);
+	height: 3.75rem;
+	margin: 0 auto;
+	padding: 0 var(--gutter);
+}
+
+.navbar-brand {
+	font-family: var(--font-console);
+	font-weight: 600;
+	color: var(--on-background);
+}
+
+.navbar-brand::after {
+	content: "_";
+	color: var(--accent-strong);
+}
+
+.navbar-links {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.navbar-link {
+	padding: 0.4rem 0.7rem;
+	border-radius: var(--radius);
+	color: var(--text-muted);
+	font-size: 0.95rem;
+	font-weight: 500;
+}
+
+.navbar-link:hover {
+	color: var(--on-background);
+	background: var(--surface-1);
+}
+
+.navbar-link[aria-current="page"] {
+	color: var(--accent);
+}
+
+.theme-toggle {
+	display: grid;
+	place-items: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	min-width: 0;
+	margin: 0 0 0 0.25rem;
+	padding: 0;
+	border-radius: var(--radius);
+	background: transparent;
+	color: var(--text-muted);
+	transition: color var(--transition), background var(--transition);
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+	filter: none;
+	color: var(--on-background);
+	background: var(--surface-1);
+}
+
+.theme-toggle div {
+	display: grid;
+}
+
+@media (max-width: 30rem) {
+	.navbar-link {
+		padding: 0.4rem 0.45rem;
+		font-size: 0.9rem;
+	}
+}

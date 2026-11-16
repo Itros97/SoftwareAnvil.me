@@ -1,6 +1,6 @@
 {
   "base": {
-    "app_name": "itros 97",
+    "app_name": "itros97",
     "app_version": "v1.0.0",
     "enviroment": "development",
     "author": "itros97"
@@ -11,7 +11,7 @@
     "language": "resources/i18n",
     "images": "resources/images",
     "icons": "resources/icons",
-    "markdowns": "resources/markdowns"
+    "content": "resources/content"
   },
   "views": {
     "url": "/#",

@@ -1,0 +1,8 @@
+{
+	"name": "Itros",
+	"headline": "Hola, soy Itros.",
+	"tagline": "Desarrollador de software. Escribo sobre lo que construyo y lo que aprendo por el camino.",
+	"socials": [
+		{ "id": "github", "label": "GitHub", "url": "https://github.com/Itros97" }
+	]
+}

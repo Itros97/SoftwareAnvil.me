@@ -1,0 +1,14 @@
+{
+	"name": "softwareanvil.me",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"serve": "python server-n-cache.py 8000",
+		"test": "tsc && node --test tests/"
+	},
+	"devDependencies": {
+		"typescript": "5.9.3"
+	}
+}
